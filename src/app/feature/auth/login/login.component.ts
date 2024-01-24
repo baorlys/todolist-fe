@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {Login} from "../../../model/Login";
-import {FormsModule} from "@angular/forms";
+import {FormControl, FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 
 @Component({
@@ -16,6 +16,9 @@ import {CommonModule} from "@angular/common";
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+
+  //Create form control
+  login = new FormControl();
 
   constructor(private router: Router) { }
 
