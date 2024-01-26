@@ -24,23 +24,22 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardModule} from '@angular/ma
 export class TodoListComponent {
   todos: any[] = [
     {
-      id : 1,
-      name : 'todo1',
+      id: 1,
+      name: 'todo1',
       description: 'description1'
     },
     {
-      id : 2,
-      name : 'todo2',
+      id: 2,
+      name: 'todo2',
       description: 'description2'
     },
     {
-      id : 3,
-      name : 'todo3',
+      id: 3,
+      name: 'todo3',
       description: 'description3'
     }]
   dones: any[] = []
   doings: any[] = []
-
 
 
   drop(event: CdkDragDrop<any[]>) {
@@ -55,4 +54,18 @@ export class TodoListComponent {
       );
     }
   }
+}
+export class Board {
+  constructor(
+    id: number,
+    title: string,
+    columns: Column[]
+  ) {}
+}
+export class Column {
+  constructor(
+    id: number,
+    title: string,
+    todos: any[],
+  ) {}
 }

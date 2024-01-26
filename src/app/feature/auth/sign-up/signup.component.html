@@ -1,24 +1,30 @@
 <div class="signup-form-container">
   <div class="form-container">
-    <form #signupForm="ngForm" (ngSubmit)="onFormSubmit(signupForm.value)" autocomplete="off" class="form">
+    <form #signupForm="ngForm" autocomplete="off" class="form">
       <h4 class="form-header">Sign up
         <i class="fa fa-sign-in" aria-hidden="true"></i>
       </h4>
+      <div class="control text-center">
+        @if (signupForm.submitted && isSignUpFailed) {
+          <div class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+          </div>
+        }
+      </div>
       <div class="control">
         <label for="name">Name</label>
-        <input ngModel #name="ngModel" minlength="3" name="name" required id="name" type="text">
-        <div class="form-error" *ngIf="name.touched && !name.valid">
-          <div *ngIf="name.errors?.['required']">
-            Name is required
+        <input [(ngModel)]="data.username" #name="ngModel" name="username" required id="name" type="text">
+        @if (name.errors && name.touched) {
+          <div class="form-error">
+            <div *ngIf="name.errors?.['required']">
+              Name is required
+            </div>
           </div>
-          <div *ngIf="name.errors?.['minlength']">
-            Name must be at least 3 characters long.
-          </div>
-        </div>
+        }
       </div>
       <div class="control">
         <label for="email">Email</label>
-        <input ngModel #email="ngModel" email="true" name="email" required id="email" type="text">
+        <input [(ngModel)]="data.email" #email="ngModel" email="true" name="email" required id="email" type="text">
         <div class="form-error" *ngIf="email.touched && !email.valid">
           <div *ngIf="email.errors?.['required']">
             Email is required
@@ -30,18 +36,38 @@
       </div>
       <div class="control">
         <label for="password">Password</label>
-        <input ngModel #password="ngModel" minlength="4" name="password" required autocomplete="new-password" id="password" type="password">
-        <div class="form-error" *ngIf="password.touched && !password.valid">
-          <div *ngIf="password.errors?.['required']">
-            Password is required
+        <input
+          [(ngModel)]="data.password" minlength="8" name="password" autocomplete="new-password" id="password" required type="password"
+          #password="ngModel"
+          [ngClass]="{ 'is-invalid': password.errors }">
+        @if (password.errors && password.touched) {
+          <div class="form-error">
+            <div *ngIf="password.errors?.['required']">
+              Password is required
+            </div>
+            <div *ngIf="password.errors?.['minlength']">
+              Password must be at least 8 characters long.
+            </div>
           </div>
-          <div *ngIf="password.errors?.['minlength']">
-            Password must be at least 4 characters long.
-          </div>
-        </div>
+        }
       </div>
       <div class="control">
-        <button [disabled]="signupForm.invalid" class="btn" type="submit">Signup</button>
+        <label for="password">Confirm Password</label>
+        <input
+          [(ngModel)]="data.confirmPassword" minlength="8" name="confirm-password" id="confirm-password" required type="password"
+          #confirmPassword="ngModel"
+          [ngClass]="{ 'is-invalid': confirmPassword.errors }">
+        @if (confirmPassword.touched && confirmPassword.value !== password.value){
+          <div class="form-error">
+            <div>
+              Confirm password don't match.
+            </div>
+
+          </div>
+        }
+      </div>
+      <div class="control">
+        <button [disabled]="signupForm.invalid" class="btn" type="submit" (click)="signUp()">Signup</button>
         <p class="alter-way">
           <a [routerLink]="'/login'">Already have an account?</a>
         </p>

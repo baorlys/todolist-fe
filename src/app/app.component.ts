@@ -1,11 +1,8 @@
 import {Component} from "@angular/core";
-import {Router, RouterLink, RouterLinkActive, RouterModule, RouterOutlet} from "@angular/router";
+import {RouterModule, RouterOutlet} from "@angular/router";
 import {HeaderComponent} from "./core/layout/header/header.component";
 import {animate, group, query, style, transition, trigger} from "@angular/animations";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {CommonModule} from "@angular/common";
-import {BrowserModule} from "@angular/platform-browser";
-import {AppRoutingModule} from "./app.routes";
 
 
 @Component({
@@ -17,7 +14,6 @@ import {AppRoutingModule} from "./app.routes";
     RouterModule,
     HeaderComponent,
     CommonModule,
-    // AppRoutingModule,
   ],
   animations: [
     trigger('slideInOut', [

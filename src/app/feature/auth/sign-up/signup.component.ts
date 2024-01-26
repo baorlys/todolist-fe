@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {Router, RouterLink} from "@angular/router";
+import {RouterLink} from "@angular/router";
 import {FormsModule} from "@angular/forms";
-import {CommonModule, NgIf} from "@angular/common";
+import {CommonModule} from "@angular/common";
+import {AuthService, SignUp} from "../service/auth.service";
+import {HttpClientModule} from "@angular/common/http";
 
 @Component({
   selector: 'app-signup',
@@ -9,21 +11,50 @@ import {CommonModule, NgIf} from "@angular/common";
   imports: [
     FormsModule,
     RouterLink,
-    CommonModule
+    CommonModule,
+    HttpClientModule
   ],
+  providers: [AuthService],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'
 })
 export class SignupComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  data : SignUp = {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  }
+  isSuccessful = false;
+  isSignUpFailed = false;
+  errorMessage = '';
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
+
   }
 
-  onFormSubmit(data: SignupComponent) {
-    console.log(data);
-    this.router.navigateByUrl('/').then(r => console.log(r))
+  signUp(){
+    if(this.validateConfirmPassword()) {
+
+    }
+    this.authService.signUp(this.data).subscribe({
+      next: data => {
+        console.log(data);
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+        this.isSignUpFailed = true;
+      }
+    })
   }
+
+  validateConfirmPassword() {
+    return this.data.password === this.data.confirmPassword;
+  }
+
+
 
 }
+
