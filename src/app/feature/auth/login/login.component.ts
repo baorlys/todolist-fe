@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {Login} from "../../../model/Login";
-import {FormControl, FormsModule} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, FormsModule, Validators} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 
 @Component({
@@ -16,19 +16,21 @@ import {CommonModule} from "@angular/common";
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
-
-  //Create form control
-  login = new FormControl();
+  submitted = false;
 
   constructor(private router: Router) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
+
   }
 
   onFormSubmit(data: Login) {
+    this.submitted = true;
     console.log(data);
     localStorage.setItem('email', data.email);
     this.router.navigateByUrl('/user').then(r => console.log(r));
   }
+
+
 
 }
