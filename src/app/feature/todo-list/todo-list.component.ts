@@ -25,20 +25,20 @@ export class TodoListComponent {
   todos: any[] = [
     {
       id: 1,
-      name: 'todo1',
+      title: 'todo1',
       description: 'description1'
     },
     {
       id: 2,
-      name: 'todo2',
+      title: 'todo2',
       description: 'description2'
     },
     {
       id: 3,
-      name: 'todo3',
+      title: 'todo3',
       description: 'description3'
     }]
-  dones: any[] = []
+  done: any[] = []
   doings: any[] = []
 
 
@@ -55,17 +55,17 @@ export class TodoListComponent {
     }
   }
 }
-export class Board {
-  constructor(
-    id: number,
-    title: string,
-    columns: Column[]
-  ) {}
-}
-export class Column {
-  constructor(
-    id: number,
-    title: string,
-    todos: any[],
-  ) {}
-}
+// export class Board {
+//   constructor(
+//     id: number,
+//     title: string,
+//     columns: Column[]
+//   ) {}
+// }
+// export class Column {
+//   constructor(
+//     id: number,
+//     title: string,
+//     todos: any[],
+//   ) {}
+// }

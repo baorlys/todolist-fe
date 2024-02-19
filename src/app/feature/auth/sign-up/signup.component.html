@@ -52,18 +52,26 @@
         }
       </div>
       <div class="control">
-        <label for="password">Confirm Password</label>
+        <label for="confirm-password">Confirm Password</label>
         <input
           [(ngModel)]="data.confirmPassword" minlength="8" name="confirm-password" id="confirm-password" required type="password"
           #confirmPassword="ngModel"
           [ngClass]="{ 'is-invalid': confirmPassword.errors }">
         @if (confirmPassword.touched && confirmPassword.value !== password.value){
-          <div class="form-error">
-            <div>
-              Confirm password don't match.
+          @if(confirmPassword.errors?.['required']) {
+            <div class="form-error">
+              <div>
+                Confirm password is required
+              </div>
             </div>
+          } @else {
+            <div class="form-error">
+              <div>
+                Confirm password don't match.
+              </div>
 
-          </div>
+            </div>
+          }
         }
       </div>
       <div class="control">

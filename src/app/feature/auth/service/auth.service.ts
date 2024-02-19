@@ -18,6 +18,8 @@ export class AuthService {
   signUp(data: SignUp) {
     return this.http.put(this.signUpUrl, data);
   }
+
+
 }
 
 export interface Login {

@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit {
     password: ''
   };
 
+  role = '';
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
@@ -44,8 +45,10 @@ export class LoginComponent implements OnInit {
   loginUser() {
     this.auth.login(this.data)
       .subscribe({
-        next: data => {
-          console.log(data);
+        next: data  => {
+          // @ts-ignore
+          localStorage.setItem('jwt', JSON.stringify(data['jwt']));
+          this.isLoggedIn = true;
         },
         error: err => {
           this.errorMessage = err.error.message;

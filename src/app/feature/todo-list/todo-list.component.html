@@ -32,7 +32,13 @@
     class="list"
     (cdkDropListDropped)="drop($event)">
     @for (item of doings; track item.id) {
-      <div class="box" cdkDrag>{{item.name}}</div>
+      <div class="box" cdkDrag>
+        <mat-card class="mt-2 mb-2">
+          <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
+          <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+          <mat-card-content style="font-weight:300;">{{item.description}}</mat-card-content>
+        </mat-card>
+      </div>
     }
   </div>
 </div>
@@ -43,12 +49,18 @@
   <div
     cdkDropList
     #doneList="cdkDropList"
-    [cdkDropListData]="dones"
+    [cdkDropListData]="done"
     [cdkDropListConnectedTo]="[todoList, doingList]"
     class="list"
     (cdkDropListDropped)="drop($event)">
-    @for (item of dones; track item.id) {
-      <div class="box" cdkDrag>{{item.name}}</div>
+    @for (item of done; track item.id) {
+      <div class="box" cdkDrag>
+        <mat-card class="mt-2 mb-2">
+          <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
+          <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+          <mat-card-content style="font-weight:300;">{{item.description}}</mat-card-content>
+        </mat-card>
+      </div>
     }
   </div>
 </div>
