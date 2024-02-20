@@ -7,7 +7,6 @@ import {HttpClient} from "@angular/common/http";
 export class AuthService {
   private loginUrl = 'http://localhost:8080/auth';
   private signUpUrl = 'http://localhost:8080/sign-up';
-
   constructor(private http: HttpClient) {
   }
 
@@ -17,6 +16,15 @@ export class AuthService {
 
   signUp(data: SignUp) {
     return this.http.put(this.signUpUrl, data);
+  }
+
+  isAuthenticated(): boolean {
+    return localStorage.getItem('jwtToken') !== null;
+  }
+
+
+  logout(): void {
+    localStorage.removeItem('jwtToken');
   }
 
 
