@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>Create new todo</h2>
+<mat-error>
+</mat-error>
+<mat-dialog-content>
+  <p>
+
+  <mat-form-field>
+    <mat-label>Title</mat-label>
+    <input matInput [(ngModel)]="data.title" required>
+  </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="data.description" required></textarea>
+    </mat-form-field>
+  </p>
+  <p>
+      <mat-label>Priority</mat-label>
+      <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="data.priorityId" required>
+        @for (pri of priorities; track pri) {
+          <mat-chip-option [selected]="pri.color" [color]="pri.color" [value]="pri.id">{{pri.name}}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+  </p>
+
+  <p>
+    <mat-form-field>
+      <mat-label>Estimation</mat-label>
+      <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="data.estimation" required>
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+      <mat-datepicker #dp disabled="false"></mat-datepicker>
+    </mat-form-field>
+  </p>
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button [disabled]="data.title === '' || data.description == ''" mat-button mat-dialog-close (click)="confirmCreate()">Confirm</button>
+</mat-dialog-actions>
+
