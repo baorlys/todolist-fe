@@ -3,16 +3,24 @@ import {
   CdkDrag,
   CdkDragDrop,
   CdkDropList,
-  DragDropModule,
   moveItemInArray,
   transferArrayItem
 } from '@angular/cdk/drag-drop'
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardModule} from '@angular/material/card'
 import {HttpClient} from "@angular/common/http";
-import {TodoListService} from "./service/todo-list.service";
+import {State, TodoListRequest, TodoListService} from "./service/todo-list.service";
 import {StorageService} from "../../core/service/storage.service";
-import {Timestamp} from "rxjs";
 import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {TdlDeleteComponent} from "./tdl-delete/tdl-delete.component";
+import {TdlAddComponent} from "./tdl-add/tdl-add.component";
+import {MatInputModule} from "@angular/material/input";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatBadge} from "@angular/material/badge";
+import {MatChip,MatChipsModule} from "@angular/material/chips";
+import {DatePipe} from "@angular/common";
+import {ToastrService} from "ngx-toastr";
+
 @Component({
   selector: 'app-todo-list',
   standalone: true,
@@ -24,7 +32,13 @@ import {MatButton, MatIconButton} from "@angular/material/button";
     MatCard,
     MatCardActions,
     MatButton,
-    MatIconButton
+    MatIconButton,
+    MatFormFieldModule,
+    MatInputModule,
+    MatBadge,
+    MatChip,
+    MatChipsModule,
+    DatePipe
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.css'
@@ -35,7 +49,11 @@ export class TodoListComponent {
   doings: any[] = []
   done: any[] = []
 
-  constructor(private http: HttpClient, private todo: TodoListService, private storage: StorageService) {
+  constructor(private http: HttpClient,
+              private todo: TodoListService,
+              private storage: StorageService,
+              public toastr: ToastrService,
+              public dialog: MatDialog) {
     this.user = storage.getItem('user');
     this.loadTodos()
   }
@@ -53,24 +71,24 @@ export class TodoListComponent {
       let todoUpdate = event.container.data[event.currentIndex]
       switch (event.container.id.split('-')[3]) {
         case '0':
-          todoUpdate.state.id = State.TODO
+          todoUpdate.state.type = State.TODO
           break;
         case '1':
-          todoUpdate.state.id = State.DOING
+          todoUpdate.state.type = State.DOING
           break;
         case '2':
-          todoUpdate.state.id = State.DONE
+          todoUpdate.state.type = State.DONE
           break;
       }
-      console.log(todoUpdate.id)
-      console.log(todoUpdate.state.id)
+
       let req:  TodoListRequest = {
         title: todoUpdate.title,
         description: todoUpdate.description,
-        stateId: todoUpdate.state.id,
-        priorityId: -1,
+        typeId: todoUpdate.state.type,
+        priorityId: 4,
         order: -1,
-        estimation: todoUpdate.estimation
+        estimation: todoUpdate.estimation,
+        userId: this.user.id
       }
       this.todo.update(todoUpdate.id, req).subscribe()
 
@@ -81,11 +99,11 @@ export class TodoListComponent {
   loadTodos() {
     this.todo.getByUserId(this.user.id).subscribe(data => {
       // @ts-ignore
-      this.todos = data.filter(data => data.state.id == '1')
+      this.todos = data.filter(data => data.state.type == '1')
       // @ts-ignore
-      this.doings = data.filter(data => data.state.id == '2')
+      this.doings = data.filter(data => data.state.type == '2')
       // @ts-ignore
-      this.done = data.filter(data => data.state.id == '3')
+      this.done = data.filter(data => data.state.type == '3')
 
 
     })
@@ -93,31 +111,56 @@ export class TodoListComponent {
 
   }
 
+
+
   edit(item: any) {
 
   }
 
   delete(item: any) {
+      this.dialog.open(TdlDeleteComponent, {
+        width: '250px',
+        data: {
+          id: item.id
+        }
+      }).afterClosed().subscribe(result => {
+        if(result === "1") {
+          this.todo.delete(item.id).subscribe(
+            {
+              next: data => {
+                this.showSuccess(item.title);
+                this.loadTodos()
+              },
+              error: err => {
+                console.log(err);
+                this.showFail();
+              }
+            })
+        }
+
+      });
+
+
+  }
+
+  removeItem() {
 
   }
 
   create() {
-
+    this.dialog.open(TdlAddComponent, {
+      width: '500px'
+    })
   }
+  showSuccess(data: any) {
+    this.toastr.success(data.title + ' has deleted!', 'Delete success!');
+  }
+
+  showFail() {
+    this.toastr.error('Todo has not deleted!', 'Delete failed!');
+  }
+
 }
 
-export enum State {
-  TODO = '1',
-  DOING = '2',
-  DONE = '3'
-}
 
-export interface TodoListRequest {
-  title: string;
-  description: string;
-  stateId: number;
-  priorityId: number;
-  order: number;
-  estimation: Date;
-}
 

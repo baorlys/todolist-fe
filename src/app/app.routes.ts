@@ -8,6 +8,10 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {TodoListComponent} from "./feature/todo-list/todo-list.component";
 import {authGuard} from "./core/guard/auth.guard";
 import {loginGuard} from "./feature/auth/login/guard/login.guard";
+import {ToastrModule} from "ngx-toastr";
+import {CommonModule} from "@angular/common";
+import {appConfig} from "./app.config";
+import {AppComponent} from "./app.component";
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -33,9 +37,13 @@ export const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes),
     BrowserModule,
-    BrowserAnimationsModule,],
+    BrowserAnimationsModule,
+    CommonModule,
+    ToastrModule.forRoot(),
+  ],
   exports: [],
-  providers: []
+  providers: [
+  ]
 })
 export class AppRoutingModule {
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {TodoListRequest} from "../todo-list.component";
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +29,10 @@ export class TodoListService {
 
 
   delete(todoListId: string) {
-    return this.http.delete(this.url + 'delete/' + todoListId);
-
+    return this.http.post(this.url + 'delete/' + todoListId, {});
   }
 
-  create(data: TodoList) {
+  create(data: TodoListRequest) {
     return this.http.put(this.url + 'create', data);
   }
 
@@ -43,12 +41,20 @@ export class TodoListService {
   }
 }
 
-export interface TodoList {
+export enum State {
+  TODO = '1',
+  DOING = '2',
+  DONE = '3'
+}
+
+export interface TodoListRequest {
   title: string;
   description: string;
-  stateId: string;
-  priorityId: string;
+  typeId: number;
+  priorityId: number;
   order: number;
   estimation: Date;
+  userId: number
 }
+
 
