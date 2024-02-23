@@ -36,9 +36,7 @@ export class TodoListService {
     return this.http.put(this.url + 'create', data);
   }
 
-  createTask(todoListId: string) {
-    return this.http.put(this.url + todoListId + '/create-task', {});
-  }
+
 }
 
 export enum State {

@@ -8,9 +8,5 @@ export interface TaskModel {
   title : string,
   description : string,
   order: number,
-  state: StateModel,
-  priority: PriorityModel,
-  estimation: Timestamp<any>,
-  assignee: [AssigneeModel]
-
+  isCompleted: boolean,
 }

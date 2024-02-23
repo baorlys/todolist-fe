@@ -20,6 +20,7 @@ import {MatBadge} from "@angular/material/badge";
 import {MatChip,MatChipsModule} from "@angular/material/chips";
 import {DatePipe} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
+import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
 
 @Component({
   selector: 'app-todo-list',
@@ -114,10 +115,32 @@ export class TodoListComponent {
 
 
   edit(item: any) {
+    this.dialog.open(TdlEditComponent, {
+      width: '700px',
+      data: {
+        item
+      }
+    })
+      .afterClosed().subscribe(result => {
+      if(result.event === 'confirm') {
+        this.todo.update(item.id, result.data).subscribe(
+          {
+            next: data => {
+              this.showSuccess( result.data, 'Update success!', 'has been updated!');
+              this.loadTodos()
+            },
+            error: err => {
+              console.log(err);
+              this.showFail( result.data, 'Update failed!', 'has not been updated!');
+            }
+          })
+      }
 
+    })
   }
 
-  delete(item: any) {
+  delete(item: any, $event:any) {
+    $event.stopPropagation();
       this.dialog.open(TdlDeleteComponent, {
         width: '250px',
         data: {
@@ -128,12 +151,12 @@ export class TodoListComponent {
           this.todo.delete(item.id).subscribe(
             {
               next: data => {
-                this.showSuccess(item.title);
+                this.showSuccess(item.title, 'Delete success!', 'has been deleted!');
                 this.loadTodos()
               },
               error: err => {
                 console.log(err);
-                this.showFail();
+                this.showFail( item.title, 'Delete failed!', 'has not been deleted!');
               }
             })
         }
@@ -143,21 +166,32 @@ export class TodoListComponent {
 
   }
 
-  removeItem() {
-
-  }
 
   create() {
     this.dialog.open(TdlAddComponent, {
       width: '500px'
+    }).afterClosed().subscribe(result => {
+      if(result.event === 'confirm') {
+        this.todo.create(result.data).subscribe(
+          {
+            next: data => {
+              this.showSuccess( result.data, 'Create success!', 'has been created!');
+              this.loadTodos()
+            },
+            error: err => {
+              console.log(err);
+              this.showFail( result.data, 'Create failed!', 'has not been created!');
+            }
+          })
+      }
     })
   }
-  showSuccess(data: any) {
-    this.toastr.success(data.title + ' has deleted!', 'Delete success!');
+  showSuccess(data: any, title: string, message: string) {
+    this.toastr.success(data.title + ' ' + message, title);
   }
 
-  showFail() {
-    this.toastr.error('Todo has not deleted!', 'Delete failed!');
+  showFail(data: any, title: string, message: string) {
+    this.toastr.error(data.title + ' ' + message, title);
   }
 
 }

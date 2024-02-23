@@ -10,8 +10,6 @@ import {authGuard} from "./core/guard/auth.guard";
 import {loginGuard} from "./feature/auth/login/guard/login.guard";
 import {ToastrModule} from "ngx-toastr";
 import {CommonModule} from "@angular/common";
-import {appConfig} from "./app.config";
-import {AppComponent} from "./app.component";
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },

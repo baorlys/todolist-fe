@@ -16,18 +16,13 @@
       </mat-card-actions>
     </mat-card>
     @for (item of todos; track item.id) {
-      <div class="box" cdkDrag>
+      <div class="box" cdkDrag (click)="edit(item)">
         <mat-card class="mt-2 mb-2 w-100">
           <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
           <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
           <mat-card-content style="font-weight:300">
-            <p>
-              <label>Description: </label>
-              {{item.description}}
-            </p>
-
-            <p>
-              <label>Estimation: </label> {{item.estimation | date:'dd/MM/yyyy'}}
+            <p class="estimation">
+              <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
             </p>
               <mat-chip-set>
 
@@ -44,8 +39,7 @@
               </mat-chip-set>
           </mat-card-content>
           <mat-card-actions class="ms-auto">
-            <button mat-icon-button (click)="edit(item)"><i class="fa-regular fa-pen-to-square"></i></button>
-            <button mat-icon-button (click)="delete(item)"><i class="fa-solid fa-trash"></i></button>
+            <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
           </mat-card-actions>
         </mat-card>
       </div>
@@ -64,13 +58,16 @@
     [cdkDropListConnectedTo]="[todoList, doneList]"
     class="list"
     (cdkDropListDropped)="drop($event)">
+
     @for (item of doings; track item.id) {
-      <div class="box" cdkDrag>
+      <div class="box" cdkDrag (click)="edit(item)">
         <mat-card class="mt-2 mb-2 w-100">
           <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
           <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
-          <mat-card-content style="font-weight:300;">
-            {{item.description}}
+          <mat-card-content style="font-weight:300">
+            <p class="estimation">
+              <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
+            </p>
             <mat-chip-set>
 
               @if(item.priority?.id == 1) {
@@ -86,8 +83,7 @@
             </mat-chip-set>
           </mat-card-content>
           <mat-card-actions class="ms-auto">
-            <button mat-icon-button (click)="edit(item)"><i class="fa-regular fa-pen-to-square"></i></button>
-            <button mat-icon-button (click)="delete(item)"><i class="fa-solid fa-trash"></i></button>
+            <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
           </mat-card-actions>
         </mat-card>
       </div>
@@ -105,13 +101,16 @@
     [cdkDropListConnectedTo]="[todoList, doingList]"
     class="list"
     (cdkDropListDropped)="drop($event)">
+
     @for (item of done; track item.id) {
-      <div class="box" cdkDrag>
+      <div class="box" cdkDrag (click)="edit(item)">
         <mat-card class="mt-2 mb-2 w-100">
           <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
           <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
-          <mat-card-content style="font-weight:300;">
-            {{item.description}}
+          <mat-card-content style="font-weight:300">
+            <p class="estimation">
+              <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
+            </p>
             <mat-chip-set>
 
               @if(item.priority?.id == 1) {
@@ -126,9 +125,8 @@
               }
             </mat-chip-set>
           </mat-card-content>
-          <mat-card-actions  class="ms-auto">
-            <button mat-icon-button (click)="edit(item)"><i class="fa-regular fa-pen-to-square"></i></button>
-            <button mat-icon-button (click)="delete(item)"><i class="fa-solid fa-trash"></i></button>
+          <mat-card-actions class="ms-auto">
+            <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
           </mat-card-actions>
         </mat-card>
       </div>

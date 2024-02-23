@@ -24,7 +24,10 @@
     "@nrwl/angular": "^17.2.8",
     "bootstrap": "^5.3.2",
     "font-awesome": "^4.7.0",
+    "install": "^0.13.0",
     "ngx-toastr": "^18.0.0",
+    "primeicons": "^6.0.1",
+    "primeng": "^17.7.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

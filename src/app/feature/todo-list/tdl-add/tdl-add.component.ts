@@ -107,31 +107,12 @@ export class TdlAddComponent {
 
 
   constructor(public dialogRef: MatDialogRef<TdlAddComponent>,
-              private todo: TodoListService,
-              private storage: StorageService,
-              private toastr: ToastrService) {}
+              private storage: StorageService
+             ) {}
   confirmCreate() {
-    this.todo.create(this.data).subscribe(
-      {
-        next: data => {
-          this.showSuccess();
-          this.dialogRef.close();
-        },
-        error: err => {
-          console.log(err);
-          this.showFail();
-          this.dialogRef.close();
-        }
-      })
+    this.dialogRef.close({event:'confirm',data:this.data});
   }
 
-  showSuccess() {
-    this.toastr.success('New todo has created!', 'Create success!');
-  }
-
-  showFail() {
-    this.toastr.error('New todo has not created!', 'Create failed!');
-  }
 }
 
 export interface Priority {

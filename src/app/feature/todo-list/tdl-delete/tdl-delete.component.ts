@@ -26,33 +26,11 @@ import {ToastrService} from "ngx-toastr";
   styleUrl: './tdl-delete.component.css'
 })
 export class TdlDeleteComponent {
-  @Output() delete = new EventEmitter<boolean>();
 
   constructor(public dialogRef: MatDialogRef<TdlDeleteComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private todo: TodoListService,
-              private toastr: ToastrService) {}
+              @Inject(MAT_DIALOG_DATA) public data: any) {}
 
 
   confirmDelete() {
-    // this.todo.delete(this.data.id).subscribe(
-    //   {
-    //     next: data => {
-    //       this.showSuccess();
-    //       this.dialogRef.close();
-    //     },
-    //     error: err => {
-    //       console.log(err);
-    //       this.showFail();
-    //     }
-    //   })
-  }
-
-  showSuccess() {
-    this.toastr.success(this.data.title + ' has deleted!', 'Delete success!');
-  }
-
-  showFail() {
-    this.toastr.error('Todo has not deleted!', 'Delete failed!');
   }
 }
