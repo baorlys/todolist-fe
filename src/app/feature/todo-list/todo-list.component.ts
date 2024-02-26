@@ -21,6 +21,10 @@ import {MatChip,MatChipsModule} from "@angular/material/chips";
 import {DatePipe} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
 import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
+import {TaskService} from "./service/task.service";
+import {TaskModel} from "../../model/Response/task.model";
+import {MatProgressBar} from "@angular/material/progress-bar";
+import {Todo} from "../../model/Response/todo.model";
 
 @Component({
   selector: 'app-todo-list',
@@ -39,7 +43,8 @@ import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
     MatBadge,
     MatChip,
     MatChipsModule,
-    DatePipe
+    DatePipe,
+    MatProgressBar
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.css'
@@ -49,9 +54,10 @@ export class TodoListComponent {
   todos: any[] = []
   doings: any[] = []
   done: any[] = []
-
+  dateNow = new Date();
   constructor(private http: HttpClient,
-              private todo: TodoListService,
+              private todoListService: TodoListService,
+              private taskService: TaskService,
               private storage: StorageService,
               public toastr: ToastrService,
               public dialog: MatDialog) {
@@ -91,25 +97,38 @@ export class TodoListComponent {
         estimation: todoUpdate.estimation,
         userId: this.user.id
       }
-      this.todo.update(todoUpdate.id, req).subscribe()
+      this.todoListService.update(todoUpdate.id, req).subscribe()
 
 
     }
   }
 
   loadTodos() {
-    this.todo.getByUserId(this.user.id).subscribe(data => {
+    this.todoListService.getByUserId(this.user.id).subscribe(data => {
       // @ts-ignore
       this.todos = data.filter(data => data.state.type == '1')
+      this.addTasksInfoToJson(this.todos)
+      console.log(this.todos)
       // @ts-ignore
       this.doings = data.filter(data => data.state.type == '2')
+      this.addTasksInfoToJson(this.doings)
+
       // @ts-ignore
       this.done = data.filter(data => data.state.type == '3')
-
+      this.addTasksInfoToJson(this.done)
 
     })
 
 
+  }
+
+  addTasksInfoToJson(list: Todo[]) {
+    list.forEach((todo: Todo) => {
+      // @ts-ignore
+      todo.tasks.total = todo.tasks.length
+      // @ts-ignore
+      todo.tasks.done = todo.tasks.filter(task => task.isCompleted).length
+    })
   }
 
 
@@ -119,23 +138,39 @@ export class TodoListComponent {
       width: '700px',
       data: {
         item
-      }
+      },
+      disableClose: true
     })
       .afterClosed().subscribe(result => {
-      if(result.event === 'confirm') {
-        this.todo.update(item.id, result.data).subscribe(
-          {
-            next: data => {
-              this.showSuccess( result.data, 'Update success!', 'has been updated!');
-              this.loadTodos()
-            },
-            error: err => {
-              console.log(err);
-              this.showFail( result.data, 'Update failed!', 'has not been updated!');
-            }
+        if(result.event === 'confirm') {
+          this.todoListService.update(item.id, result.data.todolist).subscribe(
+            {
+              next: data => {
+                this.showSuccess( result.data.todolist, 'Update success!', 'has been updated!');
+                this.loadTodos()
+              },
+              error: err => {
+                // console.log(err);
+                this.showFail( result.data.todolist, 'Update failed!', 'has not been updated!');
+              }
+            })
+          let flagTaskUpdateError = false
+          result.data.tasks.forEach((task: TaskModel) => {
+            this.taskService.update(task.id, task).subscribe({
+              next: data => {
+                this.loadTodos()
+              },
+              error: err => {
+                console.log(err);
+                flagTaskUpdateError = true
+              }
+            })
           })
-      }
+          if(flagTaskUpdateError) {
+            this.showFail( null, 'Task update failed!', 'has not been updated!');
+          }
 
+        }
     })
   }
 
@@ -148,7 +183,7 @@ export class TodoListComponent {
         }
       }).afterClosed().subscribe(result => {
         if(result === "1") {
-          this.todo.delete(item.id).subscribe(
+          this.todoListService.delete(item.id).subscribe(
             {
               next: data => {
                 this.showSuccess(item.title, 'Delete success!', 'has been deleted!');
@@ -172,7 +207,7 @@ export class TodoListComponent {
       width: '500px'
     }).afterClosed().subscribe(result => {
       if(result.event === 'confirm') {
-        this.todo.create(result.data).subscribe(
+        this.todoListService.create(result.data).subscribe(
           {
             next: data => {
               this.showSuccess( result.data, 'Create success!', 'has been created!');
@@ -194,6 +229,7 @@ export class TodoListComponent {
     this.toastr.error(data.title + ' ' + message, title);
   }
 
+  protected readonly length = length;
 }
 
 

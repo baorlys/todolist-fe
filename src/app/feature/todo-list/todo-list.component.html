@@ -37,6 +37,15 @@
                   <mat-chip style="background: #ff8a65">High</mat-chip>
                 }
               </mat-chip-set>
+            <p>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="item.tasks.done/ item.tasks.total * 100"
+                [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+              >
+
+              </mat-progress-bar>
+            </p>
           </mat-card-content>
           <mat-card-actions class="ms-auto">
             <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
@@ -61,7 +70,7 @@
 
     @for (item of doings; track item.id) {
       <div class="box" cdkDrag (click)="edit(item)">
-        <mat-card class="mt-2 mb-2 w-100">
+        <mat-card class="mt-2 mb-2 w-100 ">
           <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
           <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
           <mat-card-content style="font-weight:300">
@@ -81,6 +90,17 @@
                 <mat-chip style="background: #ff8a65">High</mat-chip>
               }
             </mat-chip-set>
+            <p>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="item.tasks.done/ item.tasks.total * 100"
+                [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+              >
+              </mat-progress-bar>
+            </p>
+            <p>
+
+            </p>
           </mat-card-content>
           <mat-card-actions class="ms-auto">
             <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
@@ -124,6 +144,15 @@
                 <mat-chip style="background: #ff8a65">High</mat-chip>
               }
             </mat-chip-set>
+            <p>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="item.tasks.done/ item.tasks.total * 100"
+                [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+              >
+
+              </mat-progress-bar>
+            </p>
           </mat-card-content>
           <mat-card-actions class="ms-auto">
             <button mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>

@@ -1,7 +1,7 @@
-import {Component, Inject} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {Component, ElementRef, inject, Inject, OnInit, ViewChild} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatChipListbox, MatChipOption, MatChipsModule} from "@angular/material/chips";
+import {MatChipInputEvent, MatChipListbox, MatChipOption, MatChipsModule} from "@angular/material/chips";
 import {
   MatDatepicker,
   MatDatepickerInput,
@@ -44,7 +44,7 @@ import {MatSelect} from "@angular/material/select";
 import { TableModule } from 'primeng/table';
 import {DropdownModule} from "primeng/dropdown";
 import {InputTextModule} from "primeng/inputtext";
-import {CurrencyPipe} from "@angular/common";
+import {AsyncPipe, CurrencyPipe} from "@angular/common";
 import {TaskModel} from "../../../model/Response/task.model";
 import {ToastModule} from "primeng/toast";
 import {ToolbarModule} from "primeng/toolbar";
@@ -53,6 +53,17 @@ import {RippleModule} from "primeng/ripple";
 import {ToastrService} from "ngx-toastr";
 import {TaskService} from "../service/task.service";
 import {PrimeIcons} from "primeng/api";
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger
+} from "@angular/material/autocomplete";
+import {map, Observable, startWith} from "rxjs";
+import {COMMA, ENTER} from "@angular/cdk/keycodes";
+import {LiveAnnouncer} from "@angular/cdk/a11y";
+import {MatGridList, MatGridTile} from "@angular/material/grid-list";
+import {UserService} from "../../user/service/user.service";
 
 @Component({
   selector: 'app-tdl-edit',
@@ -98,7 +109,12 @@ import {PrimeIcons} from "primeng/api";
     ToastModule,
     ToolbarModule,
     ButtonModule,
-    RippleModule
+    RippleModule,
+    MatAutocomplete,
+    MatAutocompleteModule,
+    AsyncPipe,
+    MatGridList,
+    MatGridTile
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
@@ -107,7 +123,7 @@ import {PrimeIcons} from "primeng/api";
   templateUrl: './tdl-edit.component.html',
   styleUrl: './tdl-edit.component.css'
 })
-export class TdlEditComponent {
+export class TdlEditComponent implements OnInit{
 
   priorities : Priority[] = [
     {
@@ -129,14 +145,14 @@ export class TdlEditComponent {
   minDate = new Date();
   tasks: TaskModel[] = []
   formData: TodoListRequest
-
   constructor(public dialogRef: MatDialogRef<TdlEditComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private stateService: StateService,
               private todoService: TodoListService,
               private storage: StorageService,
               private toastr: ToastrService,
-              private taskService: TaskService
+              private userService: UserService,
+              private taskService: TaskService,
   ) {
     this.formData = data.item
     this.loadStates()
@@ -144,11 +160,42 @@ export class TdlEditComponent {
     this.formData.priorityId = data.item.priority.id
     this.formData.typeId = data.item.state.type
     this.formData.estimation = new Date(data.item.estimation)
+    if(data.item.assignees != null){
+      // @ts-ignore
+      this.assignees = data.item.assignees.map(assignee => assignee.email)
+    }
+    this.filteredAssignees = this.assigneeCtrl.valueChanges.pipe(
+      startWith(null),
+      map((assignee: string | null) => (assignee ? this._filter(assignee) : this.allUsersEmail.slice())),
+    );
+  }
+
+  ngOnInit(): void {
+    this.dialogRef.keydownEvents().subscribe(event => {
+      if (event.key === "Escape") {
+        this.close();
+      }
+    });
+
+    this.userService.getUsers().subscribe(data => {
+      // @ts-ignore
+      this.allUsersEmail = data.map(user => user.email != this.storage.getItem('user').email ? user.email : null).filter(email => email != null)
+    })
+
+
   }
 
 
   confirm() {
-    this.dialogRef.close({event:'confirm',data:this.formData});
+    this.dialogRef.close({
+      event:'confirm',
+      data:{
+        todolist: this.formData,
+        tasks: this.tasks
+    }});
+  }
+  close() {
+    this.dialogRef.close({event:'close'});
   }
 
 
@@ -167,8 +214,6 @@ export class TdlEditComponent {
 
   loadTasks() {
     this.taskService.getTasksByTodoListId(this.data.item.id).subscribe(data => {
-      console.log(data)
-      console.log(this.tasks.length)
       // @ts-ignore
       this.tasks = data
     })
@@ -190,15 +235,89 @@ export class TdlEditComponent {
   }
 
 
-  onTaskChange() {
-
-  }
-
-  protected readonly PrimeIcons = PrimeIcons;
-
   deleteTask(task: any) {
-    
+    this.taskService.delete(task.id).subscribe(
+      {
+        next: data => {
+          this.showSuccess({title:""}, 'Success', 'Delete task success')
+          this.loadTasks()
+        },
+        error: error => {
+          this.showFail({title:""}, 'Error', 'Delete task failed')
+        }
+      })
+
   }
+
+
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  assigneeCtrl = new FormControl('',[
+    Validators.email
+  ]);
+  filteredAssignees: Observable<string[]>;
+  assignees: string[] = [];
+  allUsersEmail: string[] = [];
+
+  // @ts-ignore
+  @ViewChild('assigneeInput') assigneeInput: ElementRef<HTMLInputElement>;
+
+  announcer = inject(LiveAnnouncer);
+
+
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(value)) {
+      return;
+    }
+    if(this.assignees.includes(value)){
+      return;
+    }
+    // Add our fruit
+    if (value) {
+      this.todoService.addAssignee(this.data.item.id, {todoListId:this.data.item.id,email: value, permissionId: 2}).subscribe(
+        data => {
+          this.assignees.push(value);
+        })
+    }
+
+    // Clear the input value
+    event.chipInput!.clear();
+
+    this.assigneeCtrl.setValue(null);
+  }
+
+  remove(assignee: string): void {
+    const index = this.assignees.indexOf(assignee);
+
+    if (index >= 0) {
+      this.todoService.removeAssignee(this.data.item.id, {todoListId:this.data.item.id,email: assignee, permissionId: 2}).subscribe(
+        data => {
+          this.assignees.splice(index, 1);
+          this.announcer.announce(`Removed ${assignee}`);
+        })
+
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.todoService.addAssignee(this.data.item.id, {todoListId:this.data.item.id,email: event.option.viewValue, permissionId: 2}).subscribe(
+      data => {
+        this.assignees.push(event.option.viewValue);
+      })
+    this.assigneeInput.nativeElement.value = '';
+    this.assigneeCtrl.setValue(null);
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allUsersEmail.filter(fruit => fruit.toLowerCase().includes(filterValue));
+  }
+
+
+
 }
 export interface Element {
   name: string;

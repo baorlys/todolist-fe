@@ -37,6 +37,13 @@ export class TodoListService {
   }
 
 
+  addAssignee(todoListId: string, assignee: AssigneeRequest) {
+    return this.http.put(this.url + todoListId + '/add-assignee', assignee);
+  }
+
+  removeAssignee(todoListId: string, assignee: AssigneeRequest) {
+    return this.http.post(this.url + todoListId + '/remove-assignee', assignee);
+  }
 }
 
 export enum State {
@@ -55,4 +62,9 @@ export interface TodoListRequest {
   userId: number
 }
 
+export interface AssigneeRequest {
+  todoListId: number;
+  email: string;
+  permissionId: number;
+}
 

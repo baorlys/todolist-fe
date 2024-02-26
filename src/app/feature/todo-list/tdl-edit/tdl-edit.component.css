@@ -4,9 +4,7 @@
   align-items: flex-start;
 }
 
-.mat-mdc-chip-set {
-  max-width: 700px;
-}
+
 
 mat-dialog-content {
   width: 700px;
@@ -17,8 +15,25 @@ mat-dialog-content {
   border:none;
 }
 
+textarea {
+  min-height: 100px;
+  max-height: 100px;
+}
 
+.tasks {
+  width: 530px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
 
+.max-width {
+  width: 250px;
+}
+
+.assignee-list {
+  width: 250px;
+}
 
 
 

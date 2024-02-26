@@ -11,7 +11,7 @@ export interface Todo {
     state: StateModel,
     priority: PriorityModel,
     userId: number,
-    estimation: Timestamp<Date>,
+    estimation: string,
     task: [TaskModel]
     assignee: [AssigneeModel]
 }

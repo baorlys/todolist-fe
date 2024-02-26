@@ -1,46 +1,96 @@
-
 <mat-dialog-content>
-  <p>
+  <h2>Edit</h2>
+  <mat-grid-list cols="2" rowHeight="150px">
+    <mat-grid-tile colspan="1">
+      <mat-form-field>
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="formData.title" required>
+      </mat-form-field>
+    </mat-grid-tile>
 
-    <mat-form-field>
-      <mat-label>Title</mat-label>
-      <input matInput [(ngModel)]="formData.title" required>
-    </mat-form-field>
-  </p>
-  <p>
-    <mat-form-field>
-      <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)]="formData.description" required></textarea>
-    </mat-form-field>
-  </p>
+    <mat-grid-tile colspan="1">
+      <p class="max-width">
+      <mat-label>State</mat-label>
+      <mat-chip-listbox  aria-label="state" [(ngModel)]="formData.typeId" required>
+        @for (state of states; track state) {
+          @if (formData.typeId === state.type){
+            <mat-chip-option selected [value]="state.type" >{{state.title}}</mat-chip-option>
+          }
+          @else {
+            <mat-chip-option [value]="state.type">{{state.title}}</mat-chip-option>
+          }
+        }
+      </mat-chip-listbox>
+      </p>
+    </mat-grid-tile>
 
-  <p>
-    <mat-label>State</mat-label>
-    <mat-chip-listbox  aria-label="state" [(ngModel)]="formData.typeId" required>
-      @for (state of states; track state) {
-        @if (formData.typeId === state.type){
-          <mat-chip-option selected [value]="state.type" >{{state.title}}</mat-chip-option>
-        }
-        @else {
-          <mat-chip-option [value]="state.type">{{state.title}}</mat-chip-option>
-        }
-      }
-    </mat-chip-listbox>
-  </p>
-  <p>
-    <mat-label>Priority</mat-label>
-    <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="formData.priorityId" required>
-      @for (pri of priorities; track pri) {
-        @if (formData.priorityId === pri.id){
-          <mat-chip-option [selected]="pri.color" [color]="pri.color" [value]="pri.id" selected>{{pri.name}}</mat-chip-option>
-        }
-        @else {
-          <mat-chip-option [color]="pri.color" [value]="pri.id">{{pri.name}}</mat-chip-option>
-        }
-      }
-    </mat-chip-listbox>
-  </p>
-  <p>
+    <mat-grid-tile colspan="1">
+      <mat-form-field>
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="formData.description" required ></textarea>
+      </mat-form-field>
+    </mat-grid-tile>
+
+    <mat-grid-tile colspan="1">
+      <p class="max-width">
+        <mat-label>Priority</mat-label>
+        <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="formData.priorityId" required>
+          @for (pri of priorities; track pri) {
+            @if (formData.priorityId === pri.id){
+              <mat-chip-option [selected]="pri.color" [color]="pri.color" [value]="pri.id" selected>{{pri.name}}</mat-chip-option>
+            }
+            @else {
+              <mat-chip-option [color]="pri.color" [value]="pri.id">{{pri.name}}</mat-chip-option>
+            }
+          }
+        </mat-chip-listbox>
+      </p>
+    </mat-grid-tile>
+
+    <mat-grid-tile colspan="1">
+      <p>
+        <mat-form-field>
+          <mat-label>Estimation</mat-label>
+          <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="formData.estimation" required>
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp disabled="false"></mat-datepicker>
+        </mat-form-field>
+      </p>
+    </mat-grid-tile>
+
+
+    <mat-grid-tile colspan="1">
+      <p>
+        <mat-form-field class="assignee-list">
+          <mat-label>Assignee</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Assignee selection">
+            @for (assignee of assignees; track assignee) {
+              <mat-chip-row (removed)="remove(assignee)">
+                {{assignee}}
+                <button matChipRemove [attr.aria-label]="'remove ' + assignee">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input placeholder="Add assignee..." #assigneeInput [formControl]="assigneeCtrl"
+                 [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 (matChipInputTokenEnd)="add($event)"/>
+          <mat-hint>email of assignee</mat-hint>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            @for (assignee of filteredAssignees | async; track assignee) {
+              <mat-option [value]="assignee">{{assignee}}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </p>
+    </mat-grid-tile>
+
+
+  </mat-grid-list>
+  <div class="tasks">
     <mat-label>Task</mat-label>
 
 
@@ -61,10 +111,8 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-task let-editing="editing">
-
-
           <tr>
-            <td [pEditableColumn]="task.title" pEditableColumnField="title">
+            <td [pEditableColumn]="task.title" pEditableColumnField="title" >
               <p-cellEditor>
                 <ng-template pTemplate="input">
                   <input pInputText type="text" [(ngModel)]="task.title" />
@@ -85,7 +133,8 @@
               </p-cellEditor>
             </td>
             <td>
-              <p-tableCheckbox [value]="task" (click)="onTaskChange()"></p-tableCheckbox>
+              <input type="checkbox" [(ngModel)]="task.isCompleted" />
+<!--              <p-tableCheckbox [value]="task" ></p-tableCheckbox>-->
             </td>
             <td>
               <p-button icon="pi pi-trash" (click)="deleteTask(task)"></p-button>
@@ -102,21 +151,16 @@
         </tr>
       </ng-template>
     </p-table>
-  </p>
+  </div>
 
-  <p>
-    <mat-form-field>
-      <mat-label>Estimation</mat-label>
-      <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="formData.estimation" required>
-      <mat-hint>MM/DD/YYYY</mat-hint>
-      <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-      <mat-datepicker #dp disabled="false"></mat-datepicker>
-    </mat-form-field>
-  </p>
+
+
+
 
 
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button [disabled]="formData.title === '' || formData.description == ''" mat-button mat-dialog-close="1" (click)="confirm()">Confirm</button>
+<mat-dialog-actions class="ms-auto">
+  <button [disabled]="formData.title === '' || formData.description == ''" mat-button mat-dialog-close="1" (click)="confirm()" class="btn btn-success">Confirm</button>
+  <button mat-button mat-dialog-close="0" (click)="close()" class="btn btn-secondary">Cancel</button>
 </mat-dialog-actions>
 

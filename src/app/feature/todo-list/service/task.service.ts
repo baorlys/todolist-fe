@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {TaskModel} from "../../../model/Response/task.model";
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +11,8 @@ export class TaskService {
 
   }
 
-  update(taskId: string) {
-      return this.http.get(this.url + 'update/' + taskId);
+  update(taskId: number, task: TaskModel) {
+      return this.http.post(this.url + 'update/' + taskId, task);
   }
 
   getTasksByTodoListId(todoListId: string) {
@@ -20,5 +21,9 @@ export class TaskService {
 
   createTask(todoListId: string) {
     return this.http.put(this.url + todoListId + '/create-task', {});
+  }
+
+  delete(taskId: string) {
+    return this.http.post(this.url + 'delete/' + taskId, {});
   }
 }

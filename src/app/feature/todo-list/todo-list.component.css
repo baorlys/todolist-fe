@@ -7,9 +7,9 @@ h2 {
   margin: 0;
   border: solid 1px #ccc;
   border-radius: 4px;
-
-
 }
+
+
 .content {
   margin: 100px 170px;
   background-color:white;
@@ -81,7 +81,7 @@ h2 {
   width: 100%;
 }
 .estimation {
-  color: lightcoral;
+  color: rgb(232, 105, 105);
 }
 
 
