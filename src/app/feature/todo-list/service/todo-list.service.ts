@@ -10,6 +10,7 @@ export class TodoListService {
 
   }
 
+  //#region TodoList
   getByUserId(userId: string) {
     return this.http.get(this.url + 'user/' + userId);
   }
@@ -27,7 +28,6 @@ export class TodoListService {
   }
 
 
-
   delete(todoListId: string) {
     return this.http.post(this.url + 'delete/' + todoListId, {});
   }
@@ -35,15 +35,36 @@ export class TodoListService {
   create(data: TodoListRequest) {
     return this.http.put(this.url + 'create', data);
   }
+  //#endregion
 
-
+  //#region Assignee
   addAssignee(todoListId: string, assignee: AssigneeRequest) {
     return this.http.put(this.url + todoListId + '/add-assignee', assignee);
   }
 
-  removeAssignee(todoListId: string, assignee: AssigneeRequest) {
-    return this.http.post(this.url + todoListId + '/remove-assignee', assignee);
+  removeAssignee(todoListId: string, email: string) {
+    return this.http.post(this.url + todoListId + '/remove-assignee', email);
   }
+
+  //#endregion
+
+  //#region Comment
+  addComment(todoListId: string, comment: CommentRequest) {
+    return this.http.put(this.url + todoListId + '/add-comment', comment);
+  }
+  getComments(todoListId: string) {
+    return this.http.get(this.url + todoListId + '/get-comments');
+  }
+  updateComment(todoListId: string, commentId: string, comment: CommentRequest) {
+    return this.http.post(this.url + todoListId + '/update-comment/' + commentId, comment);
+  }
+
+  deleteComment(todoListId: string, commentId: string) {
+    return this.http.post(this.url + todoListId + '/delete-comment/' + commentId, {});
+  }
+
+  //#endregion
+
 }
 
 export enum State {
@@ -63,8 +84,13 @@ export interface TodoListRequest {
 }
 
 export interface AssigneeRequest {
-  todoListId: number;
+  todoListId: string;
   email: string;
   permissionId: number;
 }
 
+export interface CommentRequest {
+  todoListId: string;
+  content: string;
+  userId: number;
+}

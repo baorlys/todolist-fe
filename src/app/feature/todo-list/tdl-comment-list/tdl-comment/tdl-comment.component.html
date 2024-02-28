@@ -1,0 +1,50 @@
+<div class="comment">
+  <div class="comment-image-container">
+    <p-avatar label="{{comment.user.username.charAt(0)}}" styleClass="mr-2" size="xlarge" shape="circle"></p-avatar>
+
+  </div>
+  <div class="comment-right-part">
+    <div class="comment-content">
+      <div class="comment-author">{{ comment.user.username }}</div>
+      <div class="comment-time">{{createdAt}}</div>
+    </div>
+    @if (!isEditing()) {
+      <div class="comment-text">{{ comment.content }}</div>
+    }
+    @if (isEditing()) {
+      <app-tdl-comment-form submitLabel="Update"
+                            [hasCancelButton]="true"
+                            [initialText]="comment.content"
+                            (handleSubmit)="updateComment.emit({
+                              id: comment.id,
+                              content: $event
+                            })"
+                            (handleCancel)="setActiveComment.emit(null)"
+      >
+
+      </app-tdl-comment-form>
+
+    }
+    <div class="comment-actions">
+      @if (canReply){
+        <div class="comment-action" (click)="setActiveComment.emit({
+          id: comment.id,
+          type: activeCommentType.replying
+        })">Reply</div>
+      }
+      @if (canEdit){
+        <div class="comment-action" (click)="setActiveComment.emit({
+          id: comment.id,
+          type: activeCommentType.editing
+        })">Edit</div>
+      }
+      @if (canDelete){
+        <div class="comment-action"
+             (click)="deleteComment.emit(comment.id)"
+        >Delete</div>
+      }
+
+
+    </div>
+  </div>
+</div>

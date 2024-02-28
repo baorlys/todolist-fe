@@ -1,5 +1,6 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {
+  MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
@@ -30,6 +31,7 @@ import {default as _rollupMoment} from 'moment';
 import {MatChipsModule} from "@angular/material/chips";
 import {ToastrService} from "ngx-toastr";
 import {StorageService} from "../../../core/service/storage.service";
+import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-confirm-cancel-form.component";
 const moment = _rollupMoment || _moment;
 export const MY_FORMATS = {
   parse: {
@@ -74,7 +76,7 @@ export const MY_FORMATS = {
   templateUrl: './tdl-add.component.html',
   styleUrl: './tdl-add.component.css'
 })
-export class TdlAddComponent {
+export class TdlAddComponent implements OnInit{
 
   data : TodoListRequest = {
     title: '',
@@ -107,10 +109,33 @@ export class TdlAddComponent {
 
 
   constructor(public dialogRef: MatDialogRef<TdlAddComponent>,
-              private storage: StorageService
+              private storage: StorageService,
+              public dialog: MatDialog
              ) {}
+
+  ngOnInit(): void {
+    this.dialogRef.keydownEvents().subscribe(event => {
+      if (event.key === "Escape") {
+        this.close();
+      }
+    });
+    this.dialogRef.backdropClick().subscribe(() => {
+      this.close();
+    })
+
+  }
   confirmCreate() {
     this.dialogRef.close({event:'confirm',data:this.data});
+  }
+
+  close() {
+    this.dialog.open(TdlConfirmCancelFormComponent, {
+      width: '300px',
+    }).afterClosed().subscribe(result => {
+      if(result === "1") {
+        this.dialogRef.close({event:'close'});
+      }
+    });
   }
 
 }

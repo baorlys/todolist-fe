@@ -1,0 +1,26 @@
+<div class="comments">
+  <div #comment></div>
+  <h6 class="comments-title">Comments</h6>
+  <div class="comment-form-title">Write comment</div>
+  <app-tdl-comment-form submitLabel="Write" (handleSubmit)="addComment($event)"></app-tdl-comment-form>
+  @defer (on viewport(comment)) {
+    <div class="comments-container">
+      @for (comment of commentList; track comment) {
+        <app-tdl-comment [comment]="comment"
+                         [activeComment]="activeComment"
+                         (setActiveComment)="setActiveComment($event)"
+                         (updateComment)="updateComment($event)"
+                         (deleteComment)="deleteComment($event)"
+        ></app-tdl-comment>
+      }
+
+
+    </div>
+  } @loading (minimum 500ms) {
+    <span>Loading...</span>
+  } @error () {
+    <span>Error loading comments</span>
+  }
+
+
+</div>

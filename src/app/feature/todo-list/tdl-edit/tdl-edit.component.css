@@ -31,9 +31,11 @@ textarea {
   width: 250px;
 }
 
-.assignee-list {
-  width: 250px;
+
+input [disabled] {
+  color: red;
 }
+
 
 
 

@@ -84,4 +84,41 @@ h2 {
   color: rgb(232, 105, 105);
 }
 
+.assignee {
+  color: rgb(105, 232, 105);
+  width: 40px;
+}
+
+.test {
+  width: 40px;
+  background: #faffac;
+}
+.form-group {
+  margin-left: 30px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.form-control {
+  border-radius: 4px;
+  border: solid 1px #ccc;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+.has-search .form-control-feedback {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 3rem;
+  height: 2.375rem;
+  line-height: 2.375rem;
+  text-align: center;
+  pointer-events: none;
+  color: #aaa;
+  margin-top: 3px;
+  margin-left: 2px;
+}
+.has-search .form-control {
+  padding-left: 3rem;
+}
 

@@ -1,10 +1,16 @@
 <mat-dialog-content>
-  <h2>Edit</h2>
+  <div>
+    <h1>Edit</h1>
+    @if (isAssignTodo){
+      <h3>Owner: {{todoOwner.username}}</h3>
+    }
+  </div>
+
   <mat-grid-list cols="2" rowHeight="150px">
     <mat-grid-tile colspan="1">
       <mat-form-field>
         <mat-label>Title</mat-label>
-        <input matInput [(ngModel)]="formData.title" required>
+        <input matInput [(ngModel)]="formData.title" required [disabled]="isAssignTodo">
       </mat-form-field>
     </mat-grid-tile>
 
@@ -27,14 +33,14 @@
     <mat-grid-tile colspan="1">
       <mat-form-field>
         <mat-label>Description</mat-label>
-        <textarea matInput [(ngModel)]="formData.description" required ></textarea>
+        <textarea matInput [(ngModel)]="formData.description" required [disabled]="isAssignTodo"></textarea>
       </mat-form-field>
     </mat-grid-tile>
 
     <mat-grid-tile colspan="1">
       <p class="max-width">
         <mat-label>Priority</mat-label>
-        <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="formData.priorityId" required>
+        <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="formData.priorityId" required [disabled]="isAssignTodo">
           @for (pri of priorities; track pri) {
             @if (formData.priorityId === pri.id){
               <mat-chip-option [selected]="pri.color" [color]="pri.color" [value]="pri.id" selected>{{pri.name}}</mat-chip-option>
@@ -51,7 +57,7 @@
       <p>
         <mat-form-field>
           <mat-label>Estimation</mat-label>
-          <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="formData.estimation" required>
+          <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="formData.estimation" required [disabled]="isAssignTodo">
           <mat-hint>MM/DD/YYYY</mat-hint>
           <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
           <mat-datepicker #dp disabled="false"></mat-datepicker>
@@ -64,7 +70,7 @@
       <p>
         <mat-form-field class="assignee-list">
           <mat-label>Assignee</mat-label>
-          <mat-chip-grid #chipGrid aria-label="Assignee selection">
+          <mat-chip-grid #chipGrid aria-label="Assignee selection" [disabled]="isAssignTodo">
             @for (assignee of assignees; track assignee) {
               <mat-chip-row (removed)="remove(assignee)">
                 {{assignee}}
@@ -133,7 +139,7 @@
               </p-cellEditor>
             </td>
             <td>
-              <input type="checkbox" [(ngModel)]="task.isCompleted" />
+              <mat-checkbox [(ngModel)]="task.isCompleted"></mat-checkbox>
 <!--              <p-tableCheckbox [value]="task" ></p-tableCheckbox>-->
             </td>
             <td>
@@ -152,7 +158,8 @@
       </ng-template>
     </p-table>
   </div>
-
+  <mat-divider></mat-divider>
+  <app-tdl-comment-list currentTodoId="{{data.item.id}}"></app-tdl-comment-list>
 
 
 
@@ -160,7 +167,9 @@
 
 </mat-dialog-content>
 <mat-dialog-actions class="ms-auto">
-  <button [disabled]="formData.title === '' || formData.description == ''" mat-button mat-dialog-close="1" (click)="confirm()" class="btn btn-success">Confirm</button>
-  <button mat-button mat-dialog-close="0" (click)="close()" class="btn btn-secondary">Cancel</button>
+  <button [disabled]="formData.title === '' || formData.description == ''" mat-button (click)="confirm()" class="btn btn-success">Confirm</button>
+  <button mat-button (click)="close()" class="btn btn-secondary">Cancel</button>
 </mat-dialog-actions>
+
+
 

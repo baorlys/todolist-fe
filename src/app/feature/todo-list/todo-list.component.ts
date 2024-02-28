@@ -1,4 +1,7 @@
-import {Component} from '@angular/core';
+import {
+  Component,
+  HostListener,
+} from '@angular/core';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -18,13 +21,18 @@ import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatBadge} from "@angular/material/badge";
 import {MatChip,MatChipsModule} from "@angular/material/chips";
-import {DatePipe} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
 import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
 import {TaskService} from "./service/task.service";
 import {TaskModel} from "../../model/Response/task.model";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {Todo} from "../../model/Response/todo.model";
+import {FilterTodoPipe} from "../../core/pipe/filter-todo.pipe";
+import {MatCheckbox} from "@angular/material/checkbox";
+import {FormsModule} from "@angular/forms";
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
+import {SkeletonModule} from "primeng/skeleton";
 
 @Component({
   selector: 'app-todo-list',
@@ -44,17 +52,28 @@ import {Todo} from "../../model/Response/todo.model";
     MatChip,
     MatChipsModule,
     DatePipe,
-    MatProgressBar
+    MatProgressBar,
+    NgClass,
+    NgForOf,
+    FilterTodoPipe,
+    MatCheckbox,
+    FormsModule,
+    AsyncPipe,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    SkeletonModule
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.css'
 })
 export class TodoListComponent {
+  searchText: string = '';
   user: any;
   todos: any[] = []
   doings: any[] = []
   done: any[] = []
-  dateNow = new Date();
+
   constructor(private http: HttpClient,
               private todoListService: TodoListService,
               private taskService: TaskService,
@@ -64,6 +83,7 @@ export class TodoListComponent {
     this.user = storage.getItem('user');
     this.loadTodos()
   }
+
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
@@ -98,8 +118,6 @@ export class TodoListComponent {
         userId: this.user.id
       }
       this.todoListService.update(todoUpdate.id, req).subscribe()
-
-
     }
   }
 
@@ -108,15 +126,12 @@ export class TodoListComponent {
       // @ts-ignore
       this.todos = data.filter(data => data.state.type == '1')
       this.addTasksInfoToJson(this.todos)
-      console.log(this.todos)
       // @ts-ignore
       this.doings = data.filter(data => data.state.type == '2')
       this.addTasksInfoToJson(this.doings)
-
       // @ts-ignore
       this.done = data.filter(data => data.state.type == '3')
       this.addTasksInfoToJson(this.done)
-
     })
 
 
@@ -172,6 +187,7 @@ export class TodoListComponent {
 
         }
     })
+
   }
 
   delete(item: any, $event:any) {
@@ -180,7 +196,7 @@ export class TodoListComponent {
         width: '250px',
         data: {
           id: item.id
-        }
+        },
       }).afterClosed().subscribe(result => {
         if(result === "1") {
           this.todoListService.delete(item.id).subscribe(
@@ -204,7 +220,8 @@ export class TodoListComponent {
 
   create() {
     this.dialog.open(TdlAddComponent, {
-      width: '500px'
+      width: '500px',
+      disableClose: true
     }).afterClosed().subscribe(result => {
       if(result.event === 'confirm') {
         this.todoListService.create(result.data).subscribe(
@@ -212,6 +229,7 @@ export class TodoListComponent {
             next: data => {
               this.showSuccess( result.data, 'Create success!', 'has been created!');
               this.loadTodos()
+              this.edit(data)
             },
             error: err => {
               console.log(err);
@@ -229,7 +247,14 @@ export class TodoListComponent {
     this.toastr.error(data.title + ' ' + message, title);
   }
 
-  protected readonly length = length;
+}
+
+
+
+export interface Column {
+  id: string;
+  name: string;
+  data: any;
 }
 
 

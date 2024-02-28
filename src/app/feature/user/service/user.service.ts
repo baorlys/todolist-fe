@@ -12,4 +12,12 @@ export class UserService {
   public getUsers() {
     return this.http.get(this.userUrl + '/all');
   }
+
+  public getUserByEmail(email: string) {
+    return this.http.get(this.userUrl + '/email/' + email);
+  }
+
+  public getUserById(userId: number) {
+    return this.http.get(this.userUrl + '/' + userId);
+  }
 }
