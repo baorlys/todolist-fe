@@ -1,8 +1,11 @@
-import {Component} from "@angular/core";
+import {Component, Input, Output, ViewChild} from "@angular/core";
 import {RouterModule, RouterOutlet} from "@angular/router";
 import {HeaderComponent} from "./core/layout/header/header.component";
 import {animate, group, query, style, transition, trigger} from "@angular/animations";
 import {CommonModule} from "@angular/common";
+import {StorageService} from "./core/service/storage.service";
+import {MenuItem} from "primeng/api";
+import {LoginComponent} from "./feature/auth/login/login.component";
 
 
 @Component({
@@ -40,6 +43,37 @@ import {CommonModule} from "@angular/common";
 
 })
 export class AppComponent {
+
+
+  constructor(private storage: StorageService,
+  ) {
+    // let user = this.storage.getItem('user');
+    //
+    // this.isLogin = this.storage.checkLogin();
+    // this.items = [
+    //   {
+    //     label: user.username,
+    //     icon: 'pi pi-fw pi-user',
+    //     items: [
+    //       {
+    //         label: ' profile',
+    //         icon: 'pi pi-fw pi-user-edit',
+    //         routerLink: '/'
+    //       },
+    //       {
+    //         label: ' log out',
+    //         icon: 'pi pi-fw pi-sign-out',
+    //         command: () => {
+    //           this.header.showLogout();
+    //         }
+    //       }
+    //     ]
+    //   }
+    //
+    // ]
+
+  }
+
 
   triggerAnimation(outlet: RouterOutlet) {
     return outlet.activatedRouteData['animation'] || 'firstPage';

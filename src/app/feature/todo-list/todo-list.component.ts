@@ -1,6 +1,6 @@
 import {
   Component,
-  HostListener,
+  HostListener, ViewChild,
 } from '@angular/core';
 import {
   CdkDrag,
@@ -33,6 +33,19 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {FormsModule} from "@angular/forms";
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
 import {SkeletonModule} from "primeng/skeleton";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {
+  CalendarView,
+  CalendarDateFormatter,
+  DateAdapter
+} from 'angular-calendar';
+import {
+  CalendarSchedulerEvent, CalendarSchedulerEventAction, CalendarSchedulerViewComponent,
+  DAYS_IN_WEEK,
+  SchedulerDateFormatter,
+  SchedulerEventTimesChangedEvent
+} from "angular-calendar-scheduler";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-todo-list',
@@ -62,8 +75,15 @@ import {SkeletonModule} from "primeng/skeleton";
     MatDatepicker,
     MatDatepickerInput,
     MatDatepickerToggle,
-    SkeletonModule
+    SkeletonModule,
+    MatTabGroup,
+    MatTab,
+
   ],
+  providers: [{
+    provide: CalendarDateFormatter,
+    useClass: SchedulerDateFormatter
+  }],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.css'
 })
@@ -195,7 +215,8 @@ export class TodoListComponent {
       this.dialog.open(TdlDeleteComponent, {
         width: '250px',
         data: {
-          id: item.id
+          id: item.id,
+          numTodos: 1
         },
       }).afterClosed().subscribe(result => {
         if(result === "1") {
@@ -246,6 +267,38 @@ export class TodoListComponent {
   showFail(data: any, title: string, message: string) {
     this.toastr.error(data.title + ' ' + message, title);
   }
+
+  removeAllTodosDone() {
+    let numTodos = this.done.length
+    this.dialog.open(TdlDeleteComponent, {
+      width: '250px',
+      data: {
+        numTodos: numTodos
+      },
+    }).afterClosed().subscribe(result => {
+      console.log(this.done)
+      if(result === "1") {
+        this.done.forEach((todo: any) => {
+          let todoDel = todo
+          this.todoListService.delete(todo.id).subscribe(
+            {
+              next: data => {
+                this.showSuccess(todoDel, 'Delete success!', 'has been deleted!');
+                this.loadTodos()
+              },
+              error: err => {
+                console.log(err);
+                this.showFail( todoDel, 'Delete failed!', 'has not been deleted!');
+              }
+            })
+        })
+      }
+
+    });
+
+  }
+
+
 
 }
 

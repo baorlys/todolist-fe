@@ -139,7 +139,7 @@
               </p-cellEditor>
             </td>
             <td>
-              <mat-checkbox [(ngModel)]="task.isCompleted"></mat-checkbox>
+              <mat-checkbox [(ngModel)]="task.isCompleted" (change)="onTaskCompleteChange()"></mat-checkbox>
 <!--              <p-tableCheckbox [value]="task" ></p-tableCheckbox>-->
             </td>
             <td>

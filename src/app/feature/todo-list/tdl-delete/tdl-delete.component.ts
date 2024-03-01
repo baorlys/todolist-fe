@@ -28,7 +28,8 @@ import {ToastrService} from "ngx-toastr";
 export class TdlDeleteComponent {
 
   constructor(public dialogRef: MatDialogRef<TdlDeleteComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: any) {}
+              @Inject(MAT_DIALOG_DATA) public data: any) {
+  }
 
 
   confirmDelete() {

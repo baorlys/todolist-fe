@@ -240,7 +240,9 @@ export class TdlEditComponent implements OnInit{
       {
         next: data => {
           this.showSuccess({title:""}, 'Success', 'Create task success')
-          this.loadTasks()
+          // @ts-ignore
+          this.tasks.push(data)
+          this.formData.typeId = 2
         },
         error: error => {
           this.showFail({title:""}, 'Error', 'Create task failed')
@@ -253,6 +255,26 @@ export class TdlEditComponent implements OnInit{
       // @ts-ignore
       this.tasks = data
     })
+  }
+  onTaskCompleteChange() {
+    let allComplete: boolean = this.tasks.filter(task => task.isCompleted).length == this.tasks.length
+    if(allComplete) {
+      this.formData.typeId = 3
+    }
+  }
+
+  deleteTask(task: any) {
+    this.taskService.delete(task.id).subscribe(
+      {
+        next: data => {
+          this.showSuccess({title:""}, 'Success', 'Delete task success')
+          this.loadTasks()
+        },
+        error: error => {
+          this.showFail({title:""}, 'Error', 'Delete task failed')
+        }
+      })
+
   }
 
   loadStates() {
@@ -271,19 +293,7 @@ export class TdlEditComponent implements OnInit{
   }
 
 
-  deleteTask(task: any) {
-    this.taskService.delete(task.id).subscribe(
-      {
-        next: data => {
-          this.showSuccess({title:""}, 'Success', 'Delete task success')
-          this.loadTasks()
-        },
-        error: error => {
-          this.showFail({title:""}, 'Error', 'Delete task failed')
-        }
-      })
 
-  }
 
 
   separatorKeysCodes: number[] = [ENTER, COMMA];

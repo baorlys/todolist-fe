@@ -1,14 +1,8 @@
 <header>
   <div class="container">
-    <a href="#" class="logo">Todo List</a>
-    <nav>
-      <ul>
-        <li><a href="/todo-list" >Todos</a></li>
-        @if (isLoggin) {
-          <li><a>{{user.username}}</a></li>
-          <li><a href="#" (click)="logOut()">Logout</a></li>
-        }
-      </ul>
-    </nav>
+    <a (click)="homePage()" class="logo">Todo List</a>
+    @if (isLogin) {
+      <p-menubar [model]="items"></p-menubar>
+    }
   </div>
 </header>

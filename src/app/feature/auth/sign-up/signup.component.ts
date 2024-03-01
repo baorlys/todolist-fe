@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {AuthService, SignUp} from "../service/auth.service";
 import {HttpClientModule} from "@angular/common/http";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-signup',
@@ -26,10 +27,11 @@ export class SignupComponent implements OnInit {
     password: '',
     confirmPassword: ''
   }
-  isSuccessful = false;
   isSignUpFailed = false;
   errorMessage = '';
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService,
+              private toastrService: ToastrService,
+              private router: Router) { }
 
   ngOnInit() {
 
@@ -41,7 +43,14 @@ export class SignupComponent implements OnInit {
     }
     this.authService.signUp(this.data).subscribe({
       next: data => {
-        console.log(data);
+        this.data = {
+          username: '',
+          email: '',
+          password: '',
+          confirmPassword: ''
+        }
+        this.showSuccess()
+        this.router.navigate(['/login']).then(r => r)
       },
       error: err => {
         this.errorMessage = err.error.message;
@@ -52,6 +61,10 @@ export class SignupComponent implements OnInit {
 
   validateConfirmPassword() {
     return this.data.password === this.data.confirmPassword;
+  }
+
+  showSuccess() {
+    this.toastrService.success('You have successfully registered, please login', 'Success');
   }
 
 

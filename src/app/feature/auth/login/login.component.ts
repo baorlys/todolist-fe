@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
@@ -6,6 +6,8 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {AuthService, Login} from "../service/auth.service";
 import {JwtService} from "../../../core/service/jwt.service";
 import {StorageService} from "../../../core/service/storage.service";
+import {ToastrService} from "ngx-toastr";
+import {AppService} from "../../../core/service/app.service";
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,7 @@ import {StorageService} from "../../../core/service/storage.service";
     FormsModule,
     RouterLink,
     CommonModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [AuthService],
   templateUrl: './login.component.html',
@@ -33,12 +35,18 @@ export class LoginComponent implements OnInit {
   };
 
   role = '';
+  isLogin= new EventEmitter<boolean>();
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
 
 
-  constructor(private readonly auth: AuthService, private jwt: JwtService, private storage: StorageService, private router : Router) {}
+  constructor(private readonly auth: AuthService,
+              private jwt: JwtService,
+              private storage: StorageService,
+              private toastr: ToastrService,
+              private router : Router,
+              private appService: AppService) {}
 
   ngOnInit(): void {
 
@@ -48,14 +56,16 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.data)
       .subscribe({
         next: data  => {
-          alert("Login Success");
+          this.showSuccess()
           // @ts-ignore
           this.jwt.saveToken(data['jwt'])
           // @ts-ignore
           this.storage.setItem('user',data['user'])
-          this.router.navigateByUrl('/todo-list').then(r => console.log(r));
           this.isLoggedIn = true;
-          this.reloadPage();
+          this.appService.changeLoginStatus(this.isLoggedIn);
+          this.storage.setItem('isLoggedIn', this.isLoggedIn);
+          this.router.navigate(['/todo-list']).then(r => r);
+
         },
         error: err => {
           this.errorMessage = err.error.message;
@@ -64,8 +74,13 @@ export class LoginComponent implements OnInit {
       })
   }
 
-  reloadPage(): void {
-    window.location.reload();
+
+
+
+  showSuccess() {
+    this.toastr.success('Login successful', 'Success', {
+      timeOut: 500,
+    });
   }
 
 
