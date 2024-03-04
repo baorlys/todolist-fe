@@ -1,6 +1,5 @@
 import {
   Component,
-  HostListener, ViewChild,
 } from '@angular/core';
 import {
   CdkDrag,
@@ -9,12 +8,12 @@ import {
   moveItemInArray,
   transferArrayItem
 } from '@angular/cdk/drag-drop'
-import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardModule} from '@angular/material/card'
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card'
 import {HttpClient} from "@angular/common/http";
 import {State, TodoListRequest, TodoListService} from "./service/todo-list.service";
 import {StorageService} from "../../core/service/storage.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatDialog} from "@angular/material/dialog";
 import {TdlDeleteComponent} from "./tdl-delete/tdl-delete.component";
 import {TdlAddComponent} from "./tdl-add/tdl-add.component";
 import {MatInputModule} from "@angular/material/input";
@@ -35,17 +34,11 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/m
 import {SkeletonModule} from "primeng/skeleton";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {
-  CalendarView,
   CalendarDateFormatter,
-  DateAdapter
 } from 'angular-calendar';
 import {
-  CalendarSchedulerEvent, CalendarSchedulerEventAction, CalendarSchedulerViewComponent,
-  DAYS_IN_WEEK,
   SchedulerDateFormatter,
-  SchedulerEventTimesChangedEvent
 } from "angular-calendar-scheduler";
-import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-todo-list',
@@ -128,6 +121,7 @@ export class TodoListComponent {
           break;
       }
 
+
       let req:  TodoListRequest = {
         title: todoUpdate.title,
         description: todoUpdate.description,
@@ -137,7 +131,17 @@ export class TodoListComponent {
         estimation: todoUpdate.estimation,
         userId: this.user.id
       }
-      this.todoListService.update(todoUpdate.id, req).subscribe()
+      this.todoListService.update(todoUpdate.id, req).subscribe(
+        {
+          next: data => {
+            this.loadTodos()
+          },
+          error: err => {
+            console.log(err);
+            this.showFail( todoUpdate, 'Update failed!', 'has not been updated!')
+          }
+        }
+      )
     }
   }
 
@@ -178,6 +182,10 @@ export class TodoListComponent {
     })
       .afterClosed().subscribe(result => {
         if(result.event === 'confirm') {
+          console.log(result.data)
+          if(result.data.priorityId=== null) {
+            result.data.priorityId = 4
+          }
           this.todoListService.update(item.id, result.data.todolist).subscribe(
             {
               next: data => {
@@ -185,7 +193,6 @@ export class TodoListComponent {
                 this.loadTodos()
               },
               error: err => {
-                // console.log(err);
                 this.showFail( result.data.todolist, 'Update failed!', 'has not been updated!');
               }
             })

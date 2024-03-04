@@ -19,7 +19,7 @@ import {ToastrService} from "ngx-toastr";
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent {
 
   data : SignUp = {
     username: '',
@@ -33,13 +33,13 @@ export class SignupComponent implements OnInit {
               private toastrService: ToastrService,
               private router: Router) { }
 
-  ngOnInit() {
 
-  }
 
   signUp(){
     if(this.validateConfirmPassword()) {
-
+      this.errorMessage = 'Password and Confirm Password do not match';
+      this.isSignUpFailed = true;
+      return;
     }
     this.authService.signUp(this.data).subscribe({
       next: data => {

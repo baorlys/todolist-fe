@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Inject, Output, Type} from '@angular/core';
+import {Component,Inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
@@ -9,8 +8,6 @@ import {
   MatDialogTitle
 } from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
-import {TodoListService} from "../service/todo-list.service";
-import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-tdl-delete',
@@ -32,6 +29,5 @@ export class TdlDeleteComponent {
   }
 
 
-  confirmDelete() {
-  }
+
 }

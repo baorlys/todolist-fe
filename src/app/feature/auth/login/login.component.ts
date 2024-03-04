@@ -1,8 +1,8 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {AuthService, Login} from "../service/auth.service";
 import {JwtService} from "../../../core/service/jwt.service";
 import {StorageService} from "../../../core/service/storage.service";
@@ -22,7 +22,7 @@ import {AppService} from "../../../core/service/app.service";
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
 
   /*account test
@@ -48,9 +48,7 @@ export class LoginComponent implements OnInit {
               private router : Router,
               private appService: AppService) {}
 
-  ngOnInit(): void {
 
-  }
 
   loginUser() {
     this.auth.login(this.data)

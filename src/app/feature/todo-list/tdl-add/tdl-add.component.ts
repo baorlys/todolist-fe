@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   MatDialog,
   MatDialogActions,
@@ -16,7 +16,7 @@ import {
   MatDatepickerInput, MatDatepickerModule,
   MatDatepickerToggle
 } from "@angular/material/datepicker";
-import {TodoListRequest, TodoListService} from "../service/todo-list.service";
+import {TodoListRequest} from "../service/todo-list.service";
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
@@ -26,10 +26,8 @@ import {
 } from "@angular/material/core";
 import {MatIcon} from "@angular/material/icon";
 import {MomentDateAdapter} from '@angular/material-moment-adapter';
-import _moment from 'moment';
-import {default as _rollupMoment} from 'moment';
+import _moment, {default as _rollupMoment} from 'moment';
 import {MatChipsModule} from "@angular/material/chips";
-import {ToastrService} from "ngx-toastr";
 import {StorageService} from "../../../core/service/storage.service";
 import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-confirm-cancel-form.component";
 const moment = _rollupMoment || _moment;
@@ -82,7 +80,7 @@ export class TdlAddComponent implements OnInit{
     title: '',
     description: '',
     typeId: 1,
-    priorityId: 0,
+    priorityId: 4,
     order: -1,
     estimation: new Date(),
     userId: this.storage.getItem('user').id
