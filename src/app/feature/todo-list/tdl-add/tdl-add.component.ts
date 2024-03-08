@@ -83,6 +83,7 @@ export class TdlAddComponent implements OnInit{
     priorityId: 4,
     order: -1,
     estimation: new Date(),
+    projectId: 0,
     userId: this.storage.getItem('user').id
   }
 

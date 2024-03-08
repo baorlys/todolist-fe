@@ -81,6 +81,7 @@ export interface TodoListRequest {
   order: number;
   estimation: Date;
   userId: number
+  projectId: number;
 }
 
 export interface AssigneeRequest {

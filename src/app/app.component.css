@@ -1,4 +1,64 @@
-#mainContainer {
-  min-width: 100vw;
-  min-height: 100vh;
+h1 {
+  padding: 0 1rem;
 }
+
+h2 {padding: 1rem;}
+
+
+
+mat-sidenav-container {
+  height:100%;
+}
+
+mat-sidenav {
+  padding-top: 5.5rem;
+  @media screen and (min-width: 600px) {
+    padding-top: 5rem;
+    width: 250px;
+  }
+
+  .entry{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding:0.75rem;
+  }
+}
+
+mat-sidenav-content{
+  padding-top: 5.5rem;
+  @media screen and (min-width: 600px) {
+    padding-top: 60px;
+    height: 100%;
+  }
+}
+
+.project {
+  padding-left: 40px;
+}
+
+.activeItem {
+  font-weight: bold;
+  background-color: #F5F9E9;
+}
+
+.user {
+  position: absolute;
+  bottom: 0;
+  .entry {
+    font-weight: bold;
+    margin: auto;
+    width:50%;
+    span {
+      font-size: 20px;
+    }
+
+  }
+}
+
+.add {
+  padding: 0;
+  height: 25px;
+}
+
+

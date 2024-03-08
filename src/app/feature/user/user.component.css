@@ -1,7 +1,7 @@
 .content {
   margin: 100px 170px;
   height: 820px;
-  background-color:white;
+  background-color:#F5F9E9;
   padding: 30px;
 }
 .container {
@@ -11,4 +11,8 @@
   display: inline-block;
   vertical-align: top;
   text-align: center;
+}
+.content {
+  background-color: #F5F9E9;
+
 }

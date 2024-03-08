@@ -8,6 +8,7 @@ import {JwtService} from "../../../core/service/jwt.service";
 import {StorageService} from "../../../core/service/storage.service";
 import {ToastrService} from "ngx-toastr";
 import {AppService} from "../../../core/service/app.service";
+import {SocialLinksComponent} from "../../../share/social-links/social-links.component";
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ import {AppService} from "../../../core/service/app.service";
     RouterLink,
     CommonModule,
     HttpClientModule,
+    SocialLinksComponent,
   ],
   providers: [AuthService],
   templateUrl: './login.component.html',
@@ -35,7 +37,6 @@ export class LoginComponent {
   };
 
   role = '';
-  isLogin= new EventEmitter<boolean>();
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
@@ -61,7 +62,6 @@ export class LoginComponent {
           this.storage.setItem('user',data['user'])
           this.isLoggedIn = true;
           this.appService.changeLoginStatus(this.isLoggedIn);
-          this.storage.setItem('isLoggedIn', this.isLoggedIn);
           this.router.navigate(['/todo-list']).then(r => r);
 
         },
@@ -76,7 +76,7 @@ export class LoginComponent {
 
 
   showSuccess() {
-    this.toastr.success('Login successful', 'Success', {
+    this.toastr.info('Login successful', 'Success', {
       timeOut: 500,
     });
   }

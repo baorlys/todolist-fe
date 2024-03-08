@@ -1,5 +1,5 @@
 header {
-  background-color: #fff;
+  background-color: #005366;
   border-bottom: 1px solid #eee;
   height: 60px;
   padding: 0 20px;
@@ -21,15 +21,22 @@ header {
 }
 
 a.logo {
+  color: #FFB100;
   font-size: 30px;
   font-weight: bold;
-  padding: 11px;
-  max-height: 60px;
+}
+
+a:hover {
+  background-color: transparent;
 }
 
 :host ::ng-deep .p-menubar {
   margin-top: 10px;
   border: none;
+  background-color:transparent;
+}
+:host ::ng-deep .p-menubar:hover {
+  color: #FFB100;
   background-color:transparent;
 }
 
@@ -56,12 +63,24 @@ a.logo {
 
 :host ::ng-deep span {
   font-size: 15px;
+  color: #FFB100;
 }
 
 :host ::ng-deep .pi-fw {
   font-size: 20px;
 }
 
+mat-toolbar{
+  position:fixed;
+  top:0;
+  z-index: 2;
+}
 
+img {
+  max-width: 40px;
+  height: auto;
+  vertical-align: middle;
+  border: 0;
+}
 
 

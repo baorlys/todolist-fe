@@ -1,5 +1,5 @@
 import {
-  Component,
+  Component, OnChanges, OnInit, SimpleChanges,
 } from '@angular/core';
 import {
   CdkDrag,
@@ -19,7 +19,7 @@ import {TdlAddComponent} from "./tdl-add/tdl-add.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatBadge} from "@angular/material/badge";
-import {MatChip,MatChipsModule} from "@angular/material/chips";
+import {MatChip, MatChipsModule} from "@angular/material/chips";
 import {AsyncPipe, DatePipe, NgClass, NgForOf} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
 import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
@@ -39,6 +39,7 @@ import {
 import {
   SchedulerDateFormatter,
 } from "angular-calendar-scheduler";
+import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 
 @Component({
   selector: 'app-todo-list',
@@ -71,6 +72,8 @@ import {
     SkeletonModule,
     MatTabGroup,
     MatTab,
+    MatGridList,
+    MatGridTile,
 
   ],
   providers: [{
@@ -87,6 +90,8 @@ export class TodoListComponent {
   doings: any[] = []
   done: any[] = []
 
+  project: any
+
   constructor(private http: HttpClient,
               private todoListService: TodoListService,
               private taskService: TaskService,
@@ -96,6 +101,11 @@ export class TodoListComponent {
     this.user = storage.getItem('user');
     this.loadTodos()
   }
+
+
+
+
+
 
 
   drop(event: CdkDragDrop<any[]>) {
@@ -120,15 +130,14 @@ export class TodoListComponent {
           todoUpdate.state.type = State.DONE
           break;
       }
-
-
       let req:  TodoListRequest = {
         title: todoUpdate.title,
         description: todoUpdate.description,
         typeId: todoUpdate.state.type,
-        priorityId: 4,
+        priorityId: todoUpdate.priority.id,
         order: -1,
         estimation: todoUpdate.estimation,
+        projectId: todoUpdate.project.id,
         userId: this.user.id
       }
       this.todoListService.update(todoUpdate.id, req).subscribe(
@@ -145,8 +154,15 @@ export class TodoListComponent {
     }
   }
 
+
   loadTodos() {
     this.todoListService.getByUserId(this.user.id).subscribe(data => {
+      // @ts-ignore
+      let filterProject = data.filter(data => data.project != null)
+      if(this.project != undefined) {
+        // @ts-ignore
+        data = filterProject.filter(data => data.project.id == this.project.id)
+      }
       // @ts-ignore
       this.todos = data.filter(data => data.state.type == '1')
       this.addTasksInfoToJson(this.todos)
@@ -156,10 +172,12 @@ export class TodoListComponent {
       // @ts-ignore
       this.done = data.filter(data => data.state.type == '3')
       this.addTasksInfoToJson(this.done)
+
     })
 
 
   }
+
 
   addTasksInfoToJson(list: Todo[]) {
     list.forEach((todo: Todo) => {
@@ -252,6 +270,10 @@ export class TodoListComponent {
       disableClose: true
     }).afterClosed().subscribe(result => {
       if(result.event === 'confirm') {
+        if(this.project) {
+          result.data.projectId = this.project.id
+        }
+        console.log(result.data)
         this.todoListService.create(result.data).subscribe(
           {
             next: data => {

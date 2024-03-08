@@ -1,236 +1,245 @@
-<div class="content">
 
-<mat-tab-group >
-  <mat-tab label="Todo List">
-    <div class="example-large-box mat-elevation-z4">
-      <div class="form-group has-search">
-        <span class="fa fa-search form-control-feedback"></span>
-        <input type="text" class="form-control" aria-describedby="search-text"
-               [(ngModel)]="searchText" placeholder="Search..."
-        >
-      </div>
-
-      @defer () {
-        <div class="container">
-          <h2>To do</h2>
+  <div class="content">
 
 
-          <div
-            cdkDropList
-            #todoList="cdkDropList"
-            [cdkDropListData]="todos"
-            [cdkDropListConnectedTo]="[doneList, doingList]"
-            class="list"
-            (cdkDropListDropped)="drop($event)">
-            <mat-card>
-              <mat-card-actions>
+    <div class="form-group has-search">
+      <span class="fa fa-search form-control-feedback"></span>
+      <input type="text" class="form-control" aria-describedby="search-text"
+             [(ngModel)]="searchText" placeholder="Search..."
+      >
+    </div>
 
-                <button mat-raised-button (click)="create()" class="btn-add"><i class="fa-solid fa-plus"></i> Create new</button>
-              </mat-card-actions>
-            </mat-card>
-            @for (item of todos | filterTodo :searchText; track item.id ) {
-              <div class="box" cdkDrag (click)="edit(item)">
-                <mat-card class="mt-2 mb-2 w-100" [ngClass]="{'test':item.userId != user.id}">
-                  <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                  <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
-                  <mat-card-content style="font-weight:300">
-                    <p class="estimation">
-                      <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
-                    </p>
-                    <mat-chip-set>
+    @defer () {
+      <div class="todo">
 
-                      @if(item.priority?.id == 1) {
+        <div class="row">
+          <div class="col-sm">
+            <h2>Todo</h2>
 
-                        <mat-chip style="background: lightskyblue">Low</mat-chip>
-                      }
-                      @if(item.priority?.id == 2) {
-                        <mat-chip style="background: #ffcc80">Medium</mat-chip>
-                      }
-                      @if(item.priority?.id == 3) {
-                        <mat-chip style="background: #ff8a65">High</mat-chip>
-                      }
-                    </mat-chip-set>
-
-                    <p>
-                      <mat-progress-bar
-                        mode="determinate"
-                        [value]="item.tasks.done/ item.tasks.total * 100"
-                        [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
-                      >
-
-                      </mat-progress-bar>
-                    </p>
-
-                  </mat-card-content>
-
-                  <mat-card-actions>
-                    @if(item.assignees.length > 0) {
-                      <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
-                    }
-                    <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
-                  </mat-card-actions>
-                </mat-card>
-              </div>
-
-            }
-          </div>
-        </div>
-
-        <div class="container">
-          <h2>Doing</h2>
-
-          <div
-            cdkDropList
-            #doingList="cdkDropList"
-            [cdkDropListData]="doings"
-            [cdkDropListConnectedTo]="[todoList, doneList]"
-            class="list"
-            (cdkDropListDropped)="drop($event)">
-
-            @for (item of doings | filterTodo :searchText; track item.id) {
-              <div class="box" cdkDrag (click)="edit(item)">
-                <mat-card class="mt-2 mb-2 w-100 " [ngClass]="{'test':item.userId != user.id}">
-                  <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                  <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
-                  <mat-card-content style="font-weight:300">
-                    <p class="estimation">
-                      <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
-                    </p>
-                    <mat-chip-set>
-
-                      @if(item.priority?.id == 1) {
-
-                        <mat-chip style="background: lightskyblue">Low</mat-chip>
-                      }
-                      @if(item.priority?.id == 2) {
-                        <mat-chip style="background: #ffcc80">Medium</mat-chip>
-                      }
-                      @if(item.priority?.id == 3) {
-                        <mat-chip style="background: #ff8a65">High</mat-chip>
-                      }
-                    </mat-chip-set>
-                    <p>
-                      <mat-progress-bar
-                        mode="determinate"
-                        [value]="item.tasks.done/ item.tasks.total * 100"
-                        [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
-                      >
-                      </mat-progress-bar>
-                    </p>
-                    <p>
-
-                    </p>
-                  </mat-card-content>
-                  <mat-card-actions>
-                    @if(item.assignees.length > 0) {
-                      <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
-                    }
-                    <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
-                  </mat-card-actions>
-                </mat-card>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="container">
-          <h2>Done</h2>
-
-          <div
-            cdkDropList
-            #doneList="cdkDropList"
-            [cdkDropListData]="done"
-            [cdkDropListConnectedTo]="[todoList, doingList]"
-            class="list"
-            (cdkDropListDropped)="drop($event)">
-
-            @for (item of done | filterTodo :searchText; track item.id) {
-              <div class="box" cdkDrag (click)="edit(item)">
-                <mat-card class="mt-2 mb-2 w-100" [ngClass]="{'test':item.userId != user.id}">
-                  <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                  <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
-                  <mat-card-content style="font-weight:300">
-                    <p class="estimation">
-                      <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
-                    </p>
-                    <mat-chip-set>
-
-                      @if(item.priority?.id == 1) {
-
-                        <mat-chip style="background: lightskyblue">Low</mat-chip>
-                      }
-                      @if(item.priority?.id == 2) {
-                        <mat-chip style="background: #ffcc80">Medium</mat-chip>
-                      }
-                      @if(item.priority?.id == 3) {
-                        <mat-chip style="background: #ff8a65">High</mat-chip>
-                      }
-                    </mat-chip-set>
-                    <p>
-                      <mat-progress-bar
-                        mode="determinate"
-                        [value]="item.tasks.done/ item.tasks.total * 100"
-                        [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
-                      >
-                      </mat-progress-bar>
-                    </p>
-                  </mat-card-content>
-                  <mat-card-actions >
-                    @if(item.assignees.length > 0) {
-                      <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
-                    }
-                    <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
-                  </mat-card-actions>
-                </mat-card>
-
-
-              </div>
-
-            }
-            <mat-card>
-              @if(done.length > 1) {
+            <div
+              cdkDropList
+              #todoList="cdkDropList"
+              [cdkDropListData]="todos"
+              [cdkDropListConnectedTo]="[doneList, doingList]"
+              class="list"
+              (cdkDropListDropped)="drop($event)">
+              <mat-card>
                 <mat-card-actions>
 
-                  <button mat-raised-button (click)="removeAllTodosDone()" class="btn-remove"><i class="fa-solid fa-remove"></i> Remove all</button>
+                  <button mat-raised-button (click)="create()" class="btn-add"><i class="fa-solid fa-plus"></i> Create new</button>
                 </mat-card-actions>
+              </mat-card>
+              @for (item of todos | filterTodo :searchText; track item.id ) {
+                <div class="box" cdkDrag (click)="edit(item)">
+                  <mat-card class="" [ngClass]="{'test':item.userId != user.id}">
+                    <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-content style="font-weight:300">
+                      <p class="estimation">
+                        <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
+                      </p>
+                      <mat-chip-set>
+
+                        @if(item.priority?.id == 1) {
+
+                          <mat-chip style="background: lightskyblue">Low</mat-chip>
+                        }
+                        @if(item.priority?.id == 2) {
+                          <mat-chip style="background: #ffcc80">Medium</mat-chip>
+                        }
+                        @if(item.priority?.id == 3) {
+                          <mat-chip style="background: #ff8a65">High</mat-chip>
+                        }
+                      </mat-chip-set>
+
+                      <p>
+                        <mat-progress-bar
+                          mode="determinate"
+                          [value]="item.tasks.done/ item.tasks.total * 100"
+                          [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+                        >
+
+                        </mat-progress-bar>
+                      </p>
+
+                    </mat-card-content>
+
+                    <mat-card-actions>
+                      @if(item.assignees.length > 0) {
+                        <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
+                      }
+                      <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
+                    </mat-card-actions>
+                  </mat-card>
+                </div>
+
               }
-            </mat-card>
+            </div>
+
+          </div>
+          <div class="col-sm">
+            <h2>Doing</h2>
+
+            <div
+              cdkDropList
+              #doingList="cdkDropList"
+              [cdkDropListData]="doings"
+              [cdkDropListConnectedTo]="[todoList, doneList]"
+              class="list"
+              (cdkDropListDropped)="drop($event)">
+
+              @for (item of doings | filterTodo :searchText; track item.id) {
+                <div class="box" cdkDrag (click)="edit(item)">
+                  <mat-card class="mt-2 mb-2 w-100 " [ngClass]="{'test':item.userId != user.id}">
+                    <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-content style="font-weight:300">
+                      <p class="estimation">
+                        <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
+                      </p>
+                      <mat-chip-set>
+
+                        @if(item.priority?.id == 1) {
+
+                          <mat-chip style="background: lightskyblue">Low</mat-chip>
+                        }
+                        @if(item.priority?.id == 2) {
+                          <mat-chip style="background: #ffcc80">Medium</mat-chip>
+                        }
+                        @if(item.priority?.id == 3) {
+                          <mat-chip style="background: #ff8a65">High</mat-chip>
+                        }
+                      </mat-chip-set>
+                      <p>
+                        <mat-progress-bar
+                          mode="determinate"
+                          [value]="item.tasks.done/ item.tasks.total * 100"
+                          [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+                        >
+                        </mat-progress-bar>
+                      </p>
+                      <p>
+
+                      </p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                      @if(item.assignees.length > 0) {
+                        <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
+                      }
+                      <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
+                    </mat-card-actions>
+                  </mat-card>
+                </div>
+              }
+            </div>
+
+          </div>
+          <div class="col-sm">
+            <h2>Done</h2>
+
+            <div
+              cdkDropList
+              #doneList="cdkDropList"
+              [cdkDropListData]="done"
+              [cdkDropListConnectedTo]="[todoList, doingList]"
+              class="list"
+              (cdkDropListDropped)="drop($event)">
+
+              @for (item of done | filterTodo :searchText; track item.id) {
+                <div class="box" cdkDrag (click)="edit(item)">
+                  <mat-card class="mt-2 mb-2 w-100" [ngClass]="{'test':item.userId != user.id}">
+                    <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-content style="font-weight:300">
+                      <p class="estimation">
+                        <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
+                      </p>
+                      <mat-chip-set>
+
+                        @if(item.priority?.id == 1) {
+
+                          <mat-chip style="background: lightskyblue">Low</mat-chip>
+                        }
+                        @if(item.priority?.id == 2) {
+                          <mat-chip style="background: #ffcc80">Medium</mat-chip>
+                        }
+                        @if(item.priority?.id == 3) {
+                          <mat-chip style="background: #ff8a65">High</mat-chip>
+                        }
+                      </mat-chip-set>
+                      <p>
+                        <mat-progress-bar
+                          mode="determinate"
+                          [value]="item.tasks.done/ item.tasks.total * 100"
+                          [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
+                        >
+                        </mat-progress-bar>
+                      </p>
+                    </mat-card-content>
+                    <mat-card-actions >
+                      @if(item.assignees.length > 0) {
+                        <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
+                      }
+                      <button class="ms-auto" mat-icon-button (click)="delete(item,$event)"><i class="fa-solid fa-trash fa-xs"></i></button>
+                    </mat-card-actions>
+                  </mat-card>
+
+
+                </div>
+
+              }
+              <mat-card>
+                @if(done.length > 1) {
+                  <mat-card-actions>
+
+                    <button mat-raised-button (click)="removeAllTodosDone()" class="btn-remove"><i class="fa-solid fa-remove"></i> Remove all</button>
+                  </mat-card-actions>
+                }
+              </mat-card>
+            </div>
+
           </div>
         </div>
-      } @placeholder {
-        <div class="container">
+      </div>
+
+
+
+
+
+
+
+    } @placeholder {
+      <div class="todo">
+      <div class="row">
+        <div class="col-sm">
           <h2>To do</h2>
           <div class="list">
             <p-skeleton width="270px" height="600px"></p-skeleton>
 
           </div>
         </div>
-        <div class="container">
+        <div class="col-sm">
           <h2>Doing</h2>
           <div class="list">
             <p-skeleton width="270px" height="600px"></p-skeleton>
 
           </div>
+
         </div>
-        <div class="container">
+        <div class="col-sm">
           <h2>Done</h2>
           <div class="list">
             <p-skeleton width="270px" height="600px"></p-skeleton>
 
           </div>
+
         </div>
-      }
-
-    </div>
-  </mat-tab>
-  <mat-tab label="Calendar">
-    <div class="example-small-box mat-elevation-z4">
-      Implement Calendar
-    </div>
-  </mat-tab>
-</mat-tab-group>
+      </div>
+      </div>
+    }
 
 
 
 
-</div>
+  </div>
+

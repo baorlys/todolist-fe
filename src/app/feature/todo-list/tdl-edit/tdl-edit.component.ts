@@ -158,6 +158,7 @@ export class TdlEditComponent implements OnInit{
     username:'',
     mobile:''
   }
+
   constructor(public dialogRef: MatDialogRef<TdlEditComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private stateService: StateService,
@@ -175,6 +176,7 @@ export class TdlEditComponent implements OnInit{
     if(data.item.priority != null) {
       this.formData.priorityId = data.item.priority.id
     }
+    this.formData.projectId = data.item.project.id
     this.formData.typeId = data.item.state.type
     this.formData.estimation = new Date(data.item.estimation)
     this.filteredAssignees = this.assigneeCtrl.valueChanges.pipe(
@@ -209,9 +211,6 @@ export class TdlEditComponent implements OnInit{
         this.todoOwner = data
       })
     }
-
-
-
   }
 
 

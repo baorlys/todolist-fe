@@ -23,7 +23,7 @@ html {
 body {
   overflow-x: hidden;
   font-size: 1.6rem;
-  background-color: #e3e3e3;
+  background-color: #F5F9E9;
   font-family: Helvetica, sans-serif;
 }
 
@@ -253,4 +253,4 @@ a:hover {
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; padding:0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color:#F5F9E9}

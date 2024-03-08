@@ -1,4 +1,14 @@
-import {AfterContentInit, Component, DoCheck, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  DoCheck,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {AuthService} from "../../../feature/auth/service/auth.service";
 import {StorageService} from "../../service/storage.service";
@@ -6,89 +16,36 @@ import {MenubarModule} from "primeng/menubar";
 import { MenuItem } from 'primeng/api';
 import {ToastrService} from "ngx-toastr";
 import {AppService} from "../../service/app.service";
+import {MatToolbar} from "@angular/material/toolbar";
+import {MatIconButton} from "@angular/material/button";
+import {MatIconModule} from "@angular/material/icon";
+import {emit} from "@angular-devkit/build-angular/src/tools/esbuild/angular/compilation/parallel-worker";
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
-    MenubarModule
-
+    MenubarModule,
+    MatToolbar,
+    MatIconButton,
+    MatIconModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit{
+export class HeaderComponent{
 
   user: any;
   items: MenuItem[] | undefined;
-  isLogin: boolean = false
+  @Output()
+  homePageEvent = new EventEmitter();
 
-  constructor(private auth: AuthService,
-              private storage: StorageService,
-              private toastr: ToastrService,
-              private router : Router,
-              private appService: AppService,)
-  {
-
-    this.appService.currentLogin.subscribe(value => {
-      this.isLogin = value;
-      this.user = this.storage.getItem('user');
-    });
-
-  }
-
-
-  ngOnInit(): void {
-
-    if(this.auth.isAuthenticated()){
-      this.isLogin = true;
-    }
-    this.items = [
-      {
-        label: this.user.username,
-        icon: 'pi pi-fw pi-user',
-        items: [
-          {
-            label: ' profile',
-            icon: 'pi pi-fw pi-user-edit',
-            command: () => {
-              this.router.navigate(['/profile']).then(r => r);
-            }
-          },
-          {
-            label: ' log out',
-            icon: 'pi pi-fw pi-sign-out',
-            command: () => {
-              this.showLogout();
-            }
-          }
-        ]
-      }
-
-    ]
-  }
-
-
-
-  showLogout() {
-    this.toastr.warning("Are you sure you want to log out? Click to log out", "Log out",
-      {
-        positionClass: 'toast-top-center',
-        closeButton: true,
-        progressBar: true,
-        progressAnimation: 'increasing',
-      }).onTap.subscribe(() => {
-        this.logOut();
-    })
-  }
-
-  logOut() {
-    this.auth.logout();
-    this.isLogin = false;
-    this.router.navigate(['/login']).then(r => r);
-  }
-
+  constructor(
+    private router : Router,
+  )
+  {}
   homePage() {
+    this.homePageEvent.emit();
     this.router.navigate(['/']).then(r => r);
   }
 }

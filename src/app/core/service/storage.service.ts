@@ -8,6 +8,9 @@ export class StorageService {
 
 
   getItem(key: string) {
+    if(window.localStorage[key] == undefined) {
+      return undefined;
+    }
     return JSON.parse(window.localStorage[key]);
   }
 

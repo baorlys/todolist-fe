@@ -17,6 +17,7 @@ import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/
 import {MomentDateAdapter} from "@angular/material-moment-adapter";
 import {MY_FORMATS} from "./feature/todo-list/tdl-add/tdl-add.component";
 import {UserComponent} from "./feature/user/user.component";
+import {ProjectComponent} from "./feature/project/project.component";
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login',
@@ -32,6 +33,12 @@ export const routes: Routes = [
     component: TodoListComponent ,
     canActivate: [authGuard],
     data: { animation: 'todo-list'}
+  },
+  {
+    path: 'project',
+    component: ProjectComponent,
+    canActivate: [authGuard],
+    data: { animation: 'project'}
   },
   {
     path: 'profile',
