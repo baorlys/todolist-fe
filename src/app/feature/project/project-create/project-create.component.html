@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Create new Project</h2>
+<mat-error>
+</mat-error>
+<mat-dialog-content>
+  <p>
+
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input matInput [(ngModel)]="data.title" required>
+    </mat-form-field>
+  </p>
+
+  <p>
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [rangePicker]="picker" [min]="minDate" >
+      <input matStartDate placeholder="Start date" [(ngModel)]="data.fromDate">
+      <input matEndDate placeholder="End date" [(ngModel)]="data.toDate">
+    </mat-date-range-input>
+    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </p>
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button [disabled]="data.title === ''" mat-button mat-dialog-close="1" (click)="confirmCreate()">Confirm</button>
+</mat-dialog-actions>
+
