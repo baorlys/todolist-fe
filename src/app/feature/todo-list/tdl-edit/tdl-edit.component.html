@@ -13,31 +13,62 @@
         <input matInput [(ngModel)]="formData.title" required [disabled]="isAssignTodo">
       </mat-form-field>
     </mat-grid-tile>
+    <mat-grid-tile colspan="1">
+        <mat-form-field>
+          <mat-label>Project</mat-label>
+          <mat-select [(ngModel)]="formData.projectId" (selectionChange)="whenChangeProject()"   [disabled]="isAssignTodo">
+            @for(project of projectList; track project) {
+              @if (formData.projectId === project.id){
+                <mat-option selected [value]="project.id">{{project.title}}</mat-option>
+              }
+              @else {
+                <mat-option [value]="project.id">{{project.title}}</mat-option>
+              }
+            }
+          </mat-select>
+          @if(currentProject != null){
+            <mat-hint>Range: {{currentProject.fromDate | date}} - {{currentProject.toDate | date}}</mat-hint>
+          }
+        </mat-form-field>
+    </mat-grid-tile>
+
+
+
+    <mat-grid-tile colspan="2" rowspan="2" class="editor">
+        <angular-editor [config]="config" [(ngModel)]="formData.description" [disabled]="isAssignTodo"></angular-editor>
+    </mat-grid-tile>
+
 
     <mat-grid-tile colspan="1">
       <p class="max-width">
-      <mat-label>State</mat-label>
-      <mat-chip-listbox  aria-label="state" [(ngModel)]="formData.typeId" required>
-        @for (state of states; track state) {
-          @if (formData.typeId === state.type){
-            <mat-chip-option selected [value]="state.type" >{{state.title}}</mat-chip-option>
+        <mat-label>State</mat-label>
+        <mat-chip-listbox  aria-label="state" [(ngModel)]="formData.typeId" required>
+          @for (state of states; track state) {
+            @if (formData.typeId === state.type){
+              <mat-chip-option selected [value]="state.type" >{{state.title}}</mat-chip-option>
+            }
+            @else {
+              <mat-chip-option [value]="state.type">{{state.title}}</mat-chip-option>
+            }
           }
-          @else {
-            <mat-chip-option [value]="state.type">{{state.title}}</mat-chip-option>
-          }
-        }
-      </mat-chip-listbox>
+        </mat-chip-listbox>
       </p>
     </mat-grid-tile>
 
-    <mat-grid-tile colspan="1">
-      <mat-form-field>
-        <mat-label>Description</mat-label>
-        <textarea matInput [(ngModel)]="formData.description" required [disabled]="isAssignTodo"></textarea>
-      </mat-form-field>
+
+
+    <mat-grid-tile colspan="1" >
+        <mat-form-field>
+          <mat-label>Estimation</mat-label>
+          <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="dp" [(ngModel)]="formData.estimation" required [disabled]="isAssignTodo">
+
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp disabled="false"></mat-datepicker>
+        </mat-form-field>
     </mat-grid-tile>
 
-    <mat-grid-tile colspan="1">
+    <mat-grid-tile colspan="1" rowspan="1">
       <p class="max-width">
         <mat-label>Priority</mat-label>
         <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="priority" [(ngModel)]="formData.priorityId" required [disabled]="isAssignTodo">
@@ -53,21 +84,7 @@
       </p>
     </mat-grid-tile>
 
-    <mat-grid-tile colspan="1">
-      <p>
-        <mat-form-field>
-          <mat-label>Estimation</mat-label>
-          <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="formData.estimation" required [disabled]="isAssignTodo">
-          <mat-hint>MM/DD/YYYY</mat-hint>
-          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-          <mat-datepicker #dp disabled="false"></mat-datepicker>
-        </mat-form-field>
-      </p>
-    </mat-grid-tile>
-
-
-    <mat-grid-tile colspan="1">
-      <p>
+    <mat-grid-tile colspan="1" rowspan="3">
         <mat-form-field class="assignee-list">
           <mat-label>Assignee</mat-label>
           <mat-chip-grid #chipGrid aria-label="Assignee selection" [disabled]="isAssignTodo">
@@ -91,7 +108,10 @@
             }
           </mat-autocomplete>
         </mat-form-field>
-      </p>
+    </mat-grid-tile>
+
+    <mat-grid-tile colspan="1" rowspan="2">
+      <app-tdl-label></app-tdl-label>
     </mat-grid-tile>
 
 
@@ -169,7 +189,7 @@
 
 </mat-dialog-content>
 <mat-dialog-actions class="ms-auto">
-  <button [disabled]="formData.title === '' || formData.description == ''" mat-button (click)="confirm()" class="btn btn-success">Confirm</button>
+  <button [disabled]="formData.title === '' || formData.description == '' || invalidForm" mat-button (click)="confirm()" class="btn btn-success">Confirm</button>
   <button mat-button (click)="close()" class="btn btn-secondary">Cancel</button>
 </mat-dialog-actions>
 

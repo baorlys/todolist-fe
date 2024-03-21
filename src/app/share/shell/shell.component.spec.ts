@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TdlDeleteComponent } from './tdl-delete.component';
+import { ShellComponent } from './shell.component';
 
-describe('TdlDeleteComponent', () => {
-  let component: TdlDeleteComponent;
-  let fixture: ComponentFixture<TdlDeleteComponent>;
+describe('ShellComponent', () => {
+  let component: ShellComponent;
+  let fixture: ComponentFixture<ShellComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TdlDeleteComponent]
+      imports: [ShellComponent]
     })
     .compileComponents();
-    
-    fixture = TestBed.createComponent(TdlDeleteComponent);
+
+    fixture = TestBed.createComponent(ShellComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

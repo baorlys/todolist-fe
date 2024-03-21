@@ -136,3 +136,11 @@ mat-grid-list {
   padding-left: 3rem;
 }
 
+.project {
+  color: #709176;
+}
+
+mat-chip-set {
+  width: fit-content;
+}
+

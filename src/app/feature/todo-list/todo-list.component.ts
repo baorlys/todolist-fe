@@ -1,5 +1,5 @@
 import {
-  Component, OnChanges, OnInit, SimpleChanges,
+  Component
 } from '@angular/core';
 import {
   CdkDrag,
@@ -14,7 +14,6 @@ import {State, TodoListRequest, TodoListService} from "./service/todo-list.servi
 import {StorageService} from "../../core/service/storage.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
-import {TdlDeleteComponent} from "./tdl-delete/tdl-delete.component";
 import {TdlAddComponent} from "./tdl-add/tdl-add.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
@@ -40,6 +39,8 @@ import {
   SchedulerDateFormatter,
 } from "angular-calendar-scheduler";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
+import {ProjectService} from "../project/service/project.service";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-todo-list',
@@ -74,7 +75,6 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
     MatTab,
     MatGridList,
     MatGridTile,
-
   ],
   providers: [{
     provide: CalendarDateFormatter,
@@ -83,7 +83,7 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.css'
 })
-export class TodoListComponent {
+export class TodoListComponent{
   searchText: string = '';
   user: any;
   todos: any[] = []
@@ -95,18 +95,13 @@ export class TodoListComponent {
   constructor(private http: HttpClient,
               private todoListService: TodoListService,
               private taskService: TaskService,
+              private projectService: ProjectService,
               private storage: StorageService,
               public toastr: ToastrService,
               public dialog: MatDialog) {
     this.user = storage.getItem('user');
     this.loadTodos()
   }
-
-
-
-
-
-
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
@@ -136,9 +131,12 @@ export class TodoListComponent {
         typeId: todoUpdate.state.type,
         priorityId: todoUpdate.priority.id,
         order: -1,
+        projectId: 0,
         estimation: todoUpdate.estimation,
-        projectId: todoUpdate.project.id,
         userId: this.user.id
+      }
+      if(todoUpdate.project != null) {
+        req.projectId = todoUpdate.project.id
       }
       this.todoListService.update(todoUpdate.id, req).subscribe(
         {
@@ -147,7 +145,7 @@ export class TodoListComponent {
           },
           error: err => {
             console.log(err);
-            this.showFail( todoUpdate, 'Update failed!', 'has not been updated!')
+            this.showFail( 'Update failed!', 'has not been updated!')
           }
         }
       )
@@ -172,7 +170,6 @@ export class TodoListComponent {
       // @ts-ignore
       this.done = data.filter(data => data.state.type == '3')
       this.addTasksInfoToJson(this.done)
-
     })
 
 
@@ -200,18 +197,17 @@ export class TodoListComponent {
     })
       .afterClosed().subscribe(result => {
         if(result.event === 'confirm') {
-          console.log(result.data)
           if(result.data.priorityId=== null) {
             result.data.priorityId = 4
           }
           this.todoListService.update(item.id, result.data.todolist).subscribe(
             {
               next: data => {
-                this.showSuccess( result.data.todolist, 'Update success!', 'has been updated!');
+                this.showSuccess( 'Update success!', 'has been updated!');
                 this.loadTodos()
               },
               error: err => {
-                this.showFail( result.data.todolist, 'Update failed!', 'has not been updated!');
+                this.showFail( 'Update failed!', 'has not been updated!');
               }
             })
           let flagTaskUpdateError = false
@@ -227,7 +223,7 @@ export class TodoListComponent {
             })
           })
           if(flagTaskUpdateError) {
-            this.showFail( null, 'Task update failed!', 'has not been updated!');
+            this.showFail( 'Task update failed!', 'has not been updated!');
           }
 
         }
@@ -236,95 +232,115 @@ export class TodoListComponent {
   }
 
   delete(item: any, $event:any) {
+
     $event.stopPropagation();
-      this.dialog.open(TdlDeleteComponent, {
-        width: '250px',
-        data: {
-          id: item.id,
-          numTodos: 1
-        },
-      }).afterClosed().subscribe(result => {
-        if(result === "1") {
-          this.todoListService.delete(item.id).subscribe(
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to delete this todo?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if(item.userId != this.user.id) {
+          this.showInfo('Can not delete', 'You are not the owner of this todo!')
+          this.todoListService.removeAssignee(item.id, this.user.email).subscribe(
             {
               next: data => {
-                this.showSuccess(item.title, 'Delete success!', 'has been deleted!');
+                this.showSuccess('Remove assignee success!', 'You has been removed!');
                 this.loadTodos()
               },
               error: err => {
                 console.log(err);
-                this.showFail( item.title, 'Delete failed!', 'has not been deleted!');
+                this.showFail( 'Remove assignee failed!', 'You has not been removed!');
+              }
+            })
+        } else {
+          this.todoListService.delete(item.id).subscribe(
+            {
+              next: data => {
+                this.showSuccess( 'Delete success!', 'Todo has been deleted!');
+                this.loadTodos()
+              },
+              error: err => {
+                console.log(err);
+                this.showFail( 'Delete failed!', 'Todo has not been deleted!');
               }
             })
         }
-
-      });
-
-
+      }
+    })
   }
 
 
   create() {
     this.dialog.open(TdlAddComponent, {
       width: '500px',
-      disableClose: true
+      disableClose: true,
+      data: {
+        project: this.project
+      }
     }).afterClosed().subscribe(result => {
       if(result.event === 'confirm') {
         if(this.project) {
           result.data.projectId = this.project.id
         }
-        console.log(result.data)
         this.todoListService.create(result.data).subscribe(
           {
             next: data => {
-              this.showSuccess( result.data, 'Create success!', 'has been created!');
+              this.showSuccess( 'Create success!', 'has been created!');
               this.loadTodos()
               this.edit(data)
             },
             error: err => {
               console.log(err);
-              this.showFail( result.data, 'Create failed!', 'has not been created!');
+              this.showFail('Create failed!', 'has not been created!');
             }
           })
       }
     })
   }
-  showSuccess(data: any, title: string, message: string) {
-    this.toastr.success(data.title + ' ' + message, title);
+  showSuccess(title: string, message: string) {
+    this.toastr.success(message, title);
   }
 
-  showFail(data: any, title: string, message: string) {
-    this.toastr.error(data.title + ' ' + message, title);
+  showFail(title: string, message: string) {
+    this.toastr.error(message, title);
+  }
+
+  showInfo(title: string, message: string) {
+    this.toastr.info(message, title);
   }
 
   removeAllTodosDone() {
-    let numTodos = this.done.length
-    this.dialog.open(TdlDeleteComponent, {
-      width: '250px',
-      data: {
-        numTodos: numTodos
-      },
-    }).afterClosed().subscribe(result => {
-      console.log(this.done)
-      if(result === "1") {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to delete all todos done?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes'
+    }).then((result) => {
+      if (result.isConfirmed) {
         this.done.forEach((todo: any) => {
           let todoDel = todo
           this.todoListService.delete(todo.id).subscribe(
             {
               next: data => {
-                this.showSuccess(todoDel, 'Delete success!', 'has been deleted!');
+                this.showSuccess('Delete success!', '');
                 this.loadTodos()
               },
               error: err => {
                 console.log(err);
-                this.showFail( todoDel, 'Delete failed!', 'has not been deleted!');
+                this.showFail( 'Delete failed!', '');
               }
             })
         })
       }
-
-    });
-
+    })
   }
 
 

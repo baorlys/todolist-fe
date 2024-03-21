@@ -5,6 +5,7 @@ import {CommonModule} from "@angular/common";
 import {AuthService, SignUp} from "../service/auth.service";
 import {HttpClientModule} from "@angular/common/http";
 import {ToastrService} from "ngx-toastr";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-signup',
@@ -64,7 +65,10 @@ export class SignupComponent {
   }
 
   showSuccess() {
-    this.toastrService.success('You have successfully registered, please login', 'Success');
+    Swal.fire(
+      "Success",
+      "Sign up successfully",
+      "success")
   }
 
 

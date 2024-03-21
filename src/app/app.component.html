@@ -1,10 +1,11 @@
+<app-shell></app-shell>
 <app-header (homePageEvent)="home()" ></app-header>
   <mat-sidenav-container autosize>
     <mat-sidenav [opened]="isLogged" mode="side">
       <mat-nav-list>
         <mat-list-item (click)="home()" [ngClass]="{'activeItem': page['home']}">
         <span class="entry">
-          <mat-icon>apps</mat-icon>
+          <mat-icon>list</mat-icon>
           <span>All</span>
         </span>
         </mat-list-item>
@@ -22,29 +23,44 @@
         </div>
 
 
-        <div mat-subheader>
-          <span class="entry">
-            <mat-icon>assignment_turned_in</mat-icon>
-            <span>Project</span>
-            <button class="btn btn-link add" (click)="createProject()"><mat-icon >add_circle_outline</mat-icon></button>
-          </span>
-        </div>
-        <app-project (project)="chooseProject($event)"
-                     [clickOtherPageEvent]= "(page['home'] || page['calendar'] || page['profile'])"
-                     [projectAddEvent]="flagAddProject"
-        ></app-project>
-
+          <mat-list-item (click)="createProject()">
+            <span class="entry">
+              <mat-icon>assignment_turned_in</mat-icon>
+              <span>Project</span>
+              <button mat-icon-button >
+                   <mat-icon>add</mat-icon>
+                 </button>
+            </span>
+          </mat-list-item>
         @if(isLogged) {
-          <mat-list-item class="user " [matMenuTriggerFor]="userAction" [ngClass]="{'activeItem': page['profile']}">
+          <app-project (project)="chooseProject($event)"
+                       [clickOtherPageEvent]= "(page['home'] || page['calendar'] || page['profile'])"
+                       [projectAddEvent]="flagAddProject"
+                       [projectDeleteEvent]="flagDeleteProject"
+          ></app-project>
+        }
+
+
+
+        @defer () {
+          @if(isLogged) {
+            <mat-list-item class="user " [matMenuTriggerFor]="userAction" [ngClass]="{'activeItem': page['profile']}">
           <span>
           <mat-divider></mat-divider>
           </span>
-            <span class="entry mt-auto">
+              <span class="entry mt-auto">
           <mat-icon>account_circle</mat-icon>
           <span>{{ user.username }}</span>
         </span>
+            </mat-list-item>
+          }
+        } @placeholder () {
+          <mat-list-item class="user">
+            <p-skeleton></p-skeleton>
           </mat-list-item>
         }
+
+
 
 
         <mat-menu #userAction="matMenu" xPosition="before"  yPosition="above">
@@ -57,7 +73,13 @@
       <div [@slideInOut]="triggerAnimation(outlet)">
 
       <router-outlet #outlet="outlet" (activate)="getTodoComponent($event)"></router-outlet>
+        @if(project != null) {
+          <div class="del-project fixed-bottom mb-3 mr-3">
+            <button mat-flat-button color="warn" (click)="deleteProject()">Delete Project</button>
+          </div>
+        }
       </div>
+
 
 
     </mat-sidenav-content>

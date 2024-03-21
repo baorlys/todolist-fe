@@ -3,13 +3,15 @@ import {UserModel} from "../../model/Response/user.model";
 import {StorageService} from "../../core/service/storage.service";
 import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
+import {EditorjsComponent} from "../../share/editorjs/editorjs.component";
 
 @Component({
   selector: 'app-user',
   standalone: true,
   imports: [
     MatInput,
-    FormsModule
+    FormsModule,
+    EditorjsComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'

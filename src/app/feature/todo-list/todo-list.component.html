@@ -29,16 +29,21 @@
                   <button mat-raised-button (click)="create()" class="btn-add"><i class="fa-solid fa-plus"></i> Create new</button>
                 </mat-card-actions>
               </mat-card>
-              @for (item of todos | filterTodo :searchText; track item.id ) {
+              @for (item of todos | filterTodo :searchText; track item.id) {
                 <div class="box" cdkDrag (click)="edit(item)">
-                  <mat-card class="" [ngClass]="{'test':item.userId != user.id}">
+                  <mat-card class="mt-2 mb-2 w-100 " [ngClass]="{'test':item.userId != user.id}">
                     <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">
+                      <span class="">{{item.title}}</span>
+                      @if(item.project != null) {
+                        <span class="project ms-auto text-end">{{item.project.title.toUpperCase()}}</span>
+                      }
+                    </mat-card-header>
                     <mat-card-content style="font-weight:300">
-                      <p class="estimation">
+                      <p class="estimation text-center">
                         <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
                       </p>
-                      <mat-chip-set>
+                      <mat-chip-set class="mx-auto">
 
                         @if(item.priority?.id == 1) {
 
@@ -51,19 +56,18 @@
                           <mat-chip style="background: #ff8a65">High</mat-chip>
                         }
                       </mat-chip-set>
-
                       <p>
                         <mat-progress-bar
                           mode="determinate"
                           [value]="item.tasks.done/ item.tasks.total * 100"
                           [color]="item.tasks.done/ item.tasks.total * 100 < 50 ? 'warn' : 'primary'"
                         >
-
                         </mat-progress-bar>
                       </p>
+                      <p>
 
+                      </p>
                     </mat-card-content>
-
                     <mat-card-actions>
                       @if(item.assignees.length > 0) {
                         <div matBadge="{{item.assignees.length}}" class="assignee me-auto"><i class="fa-solid fa-users"></i></div>
@@ -72,7 +76,6 @@
                     </mat-card-actions>
                   </mat-card>
                 </div>
-
               }
             </div>
 
@@ -92,12 +95,17 @@
                 <div class="box" cdkDrag (click)="edit(item)">
                   <mat-card class="mt-2 mb-2 w-100 " [ngClass]="{'test':item.userId != user.id}">
                     <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">
+                      <span class="">{{item.title}}</span>
+                      @if(item.project != null) {
+                        <span class="project ms-auto text-end">{{item.project.title.toUpperCase()}}</span>
+                      }
+                    </mat-card-header>
                     <mat-card-content style="font-weight:300">
-                      <p class="estimation">
+                      <p class="estimation text-center">
                         <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
                       </p>
-                      <mat-chip-set>
+                      <mat-chip-set class="mx-auto">
 
                         @if(item.priority?.id == 1) {
 
@@ -149,12 +157,17 @@
                 <div class="box" cdkDrag (click)="edit(item)">
                   <mat-card class="mt-2 mb-2 w-100" [ngClass]="{'test':item.userId != user.id}">
                     <mat-card-header [hidden]="true" style="font-weight:500;">{{item.id}}</mat-card-header>
-                    <mat-card-header style="font-weight:500;">{{item.title}}</mat-card-header>
+                    <mat-card-header style="font-weight:500;">
+                      <span class="">{{item.title}}</span>
+                      @if(item.project != null) {
+                        <span class="project ms-auto text-end">{{item.project.title.toUpperCase()}}</span>
+                      }
+                    </mat-card-header>
                     <mat-card-content style="font-weight:300">
-                      <p class="estimation">
+                      <p class="estimation text-center">
                         <i class="fa fa-calendar-o" aria-hidden="true"></i> {{item.estimation | date:'dd MMMM yyyy'}}
                       </p>
-                      <mat-chip-set>
+                      <mat-chip-set class="mx-auto">
 
                         @if(item.priority?.id == 1) {
 
@@ -214,14 +227,14 @@
         <div class="col-sm">
           <h2>To do</h2>
           <div class="list">
-            <p-skeleton width="270px" height="600px"></p-skeleton>
+            <p-skeleton width="270px" height="750px"></p-skeleton>
 
           </div>
         </div>
         <div class="col-sm">
           <h2>Doing</h2>
           <div class="list">
-            <p-skeleton width="270px" height="600px"></p-skeleton>
+            <p-skeleton width="270px" height="750px"></p-skeleton>
 
           </div>
 
@@ -229,7 +242,7 @@
         <div class="col-sm">
           <h2>Done</h2>
           <div class="list">
-            <p-skeleton width="270px" height="600px"></p-skeleton>
+            <p-skeleton width="270px" height="750px"></p-skeleton>
 
           </div>
 
@@ -237,6 +250,7 @@
       </div>
       </div>
     }
+
 
 
 

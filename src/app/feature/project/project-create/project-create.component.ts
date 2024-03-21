@@ -8,7 +8,6 @@ import {
   MatDialogTitle
 } from "@angular/material/dialog";
 import {StorageService} from "../../../core/service/storage.service";
-import {TdlConfirmCancelFormComponent} from "../../todo-list/tdl-confirm-cancel-form/tdl-confirm-cancel-form.component";
 import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {
@@ -20,6 +19,7 @@ import {
   provideNativeDateAdapter
 } from "@angular/material/core";
 import {ProjectService} from "../service/project.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-project-create',
@@ -61,13 +61,19 @@ export class ProjectCreateComponent implements OnInit {
   }
 
   close() {
-    this.dialog.open(TdlConfirmCancelFormComponent, {
-      width: '300px',
-    }).afterClosed().subscribe(result => {
-      if(result === "1") {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will lose your changes!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, close it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.value) {
         this.dialogRef.close({event:'close'});
       }
-    });
+    })
+
   }
 
   confirmCreate() {

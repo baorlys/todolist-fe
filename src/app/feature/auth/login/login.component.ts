@@ -9,6 +9,7 @@ import {StorageService} from "../../../core/service/storage.service";
 import {ToastrService} from "ngx-toastr";
 import {AppService} from "../../../core/service/app.service";
 import {SocialLinksComponent} from "../../../share/social-links/social-links.component";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-login',
@@ -66,6 +67,7 @@ export class LoginComponent {
 
         },
         error: err => {
+          this.showFail()
           this.errorMessage = err.error.message;
           this.isLoginFailed = true;
         }
@@ -76,9 +78,19 @@ export class LoginComponent {
 
 
   showSuccess() {
-    this.toastr.info('Login successful', 'Success', {
-      timeOut: 500,
-    });
+
+    Swal.fire(
+      "Login successful",
+      "You are now logged in",
+      "success")
+  }
+
+  showFail() {
+
+    Swal.fire(
+      "Login failed",
+      "Please check your credentials",
+      "error")
   }
 
 

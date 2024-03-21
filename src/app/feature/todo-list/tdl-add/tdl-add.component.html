@@ -27,7 +27,11 @@
   <p>
     <mat-form-field>
       <mat-label>Estimation</mat-label>
-      <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="data.estimation" required>
+      @if(dataParent.project != null) {
+        <input matInput [min]="minDate"  [max]="maxDate" [matDatepicker]="dp" [(ngModel)]="data.estimation" required>
+      } @else {
+        <input matInput [min]="minDate"  [matDatepicker]="dp" [(ngModel)]="data.estimation" required>
+      }
       <mat-hint>MM/DD/YYYY</mat-hint>
       <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
       <mat-datepicker #dp disabled="false"></mat-datepicker>

@@ -1,5 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {
+  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogActions,
   MatDialogClose,
@@ -29,7 +30,7 @@ import {MomentDateAdapter} from '@angular/material-moment-adapter';
 import _moment, {default as _rollupMoment} from 'moment';
 import {MatChipsModule} from "@angular/material/chips";
 import {StorageService} from "../../../core/service/storage.service";
-import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-confirm-cancel-form.component";
+import Swal from "sweetalert2";
 const moment = _rollupMoment || _moment;
 export const MY_FORMATS = {
   parse: {
@@ -104,13 +105,19 @@ export class TdlAddComponent implements OnInit{
       color: 'warn'
     }]
   minDate = new Date();
+  maxDate = new Date();
 
 
 
   constructor(public dialogRef: MatDialogRef<TdlAddComponent>,
               private storage: StorageService,
-              public dialog: MatDialog
-             ) {}
+              public dialog: MatDialog,
+              @Inject(MAT_DIALOG_DATA) public dataParent: any
+             ) {
+    if(dataParent.project != null){
+      this.maxDate = new Date(dataParent.project.toDate)
+    }
+  }
 
   ngOnInit(): void {
     this.dialogRef.keydownEvents().subscribe(event => {
@@ -128,13 +135,19 @@ export class TdlAddComponent implements OnInit{
   }
 
   close() {
-    this.dialog.open(TdlConfirmCancelFormComponent, {
-      width: '300px',
-    }).afterClosed().subscribe(result => {
-      if(result === "1") {
-        this.dialogRef.close({event:'close'});
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will lose all the information',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, close it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.dialogRef.close({event:'cancel'});
       }
-    });
+    })
+
   }
 
 }

@@ -20,6 +20,8 @@ import {MatToolbar} from "@angular/material/toolbar";
 import {MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {emit} from "@angular-devkit/build-angular/src/tools/esbuild/angular/compilation/parallel-worker";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-header',
@@ -28,7 +30,9 @@ import {emit} from "@angular-devkit/build-angular/src/tools/esbuild/angular/comp
     MenubarModule,
     MatToolbar,
     MatIconButton,
-    MatIconModule
+    MatIconModule,
+    MatSlideToggle,
+    FormsModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
@@ -39,6 +43,7 @@ export class HeaderComponent{
   items: MenuItem[] | undefined;
   @Output()
   homePageEvent = new EventEmitter();
+  enableNotification: any;
 
   constructor(
     private router : Router,

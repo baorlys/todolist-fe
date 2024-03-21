@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatChipInputEvent, MatChipsModule} from "@angular/material/chips";
@@ -43,7 +43,7 @@ import {MatSelect} from "@angular/material/select";
 import {TableModule } from 'primeng/table';
 import {DropdownModule} from "primeng/dropdown";
 import {InputTextModule} from "primeng/inputtext";
-import {AsyncPipe, CurrencyPipe} from "@angular/common";
+import {AsyncPipe, CurrencyPipe, DatePipe} from "@angular/common";
 import {TaskModel} from "../../../model/Response/task.model";
 import {ToastModule} from "primeng/toast";
 import {ToolbarModule} from "primeng/toolbar";
@@ -65,7 +65,13 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {UserModel} from "../../../model/Response/user.model";
 import {TdlCommentListComponent} from "../tdl-comment-list/tdl-comment-list.component";
 import {MatDivider} from "@angular/material/divider";
-import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-confirm-cancel-form.component";
+import {ProjectService} from "../../project/service/project.service";
+import Swal from "sweetalert2";
+import {EditorjsComponent} from "../../../share/editorjs/editorjs.component";
+import {ShellComponent} from "../../../share/shell/shell.component";
+import {AngularEditorConfig, AngularEditorModule} from "@kolkov/angular-editor";
+import {TdlLabelComponent} from "./tdl-label/tdl-label.component";
+import {NzColorPickerComponent} from "ng-zorro-antd/color-picker";
 
 @Component({
   selector: 'app-tdl-edit',
@@ -119,7 +125,13 @@ import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-conf
     MatGridTile,
     MatCheckbox,
     TdlCommentListComponent,
-    MatDivider
+    MatDivider,
+    DatePipe,
+    EditorjsComponent,
+    ShellComponent,
+    AngularEditorModule,
+    TdlLabelComponent,
+    NzColorPickerComponent
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
@@ -129,6 +141,42 @@ import {TdlConfirmCancelFormComponent} from "../tdl-confirm-cancel-form/tdl-conf
   styleUrl: './tdl-edit.component.css'
 })
 export class TdlEditComponent implements OnInit{
+  isAssignTodo = false
+  config: AngularEditorConfig = {
+    editable: !this.isAssignTodo,
+    spellcheck: true,
+    height: '15rem',
+    minHeight: '5rem',
+    width: 'auto',
+    placeholder: 'Description...',
+    translate: 'no',
+    enableToolbar: true,
+    showToolbar: true,
+    defaultParagraphSeparator: 'p',
+    defaultFontName: 'Arial',
+    toolbarHiddenButtons:[
+      ['fontSize'],
+      ['insertImage'],
+      ['insertVideo'],
+      ['insertHorizontalRule'],
+      ['removeFormat'],
+      ['toggleEditorMode'],
+      ['textColor'],
+      ['backgroundColor'],
+      ['customClasses'],
+      ['unlink'],
+      ['superscript'],
+      ['subscript'],
+      ['justifyLeft'],
+      ['justifyCenter'],
+      ['justifyRight'],
+      ['justifyFull'],
+      ['undo'],
+      ['redo'],
+    ],
+
+  };
+
 
   priorities : Priority[] = [
     {
@@ -148,16 +196,20 @@ export class TdlEditComponent implements OnInit{
     }]
   states : StateModel[] = []
   minDate = new Date();
+  maxDate !:Date;
   tasks: TaskModel[] = []
   formData: TodoListRequest
   user = this.storage.getItem('user')
-  isAssignTodo = false
   todoOwner : UserModel = {
     id: '',
     email:'',
     username:'',
     mobile:''
   }
+  currentProject : any = null
+
+
+  projectList: any[] = [];
 
   constructor(public dialogRef: MatDialogRef<TdlEditComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any,
@@ -168,6 +220,7 @@ export class TdlEditComponent implements OnInit{
               private userService: UserService,
               private taskService: TaskService,
               private userServive: UserService,
+              private projectService: ProjectService,
               public dialog: MatDialog
   ) {
     this.formData = data.item
@@ -176,7 +229,13 @@ export class TdlEditComponent implements OnInit{
     if(data.item.priority != null) {
       this.formData.priorityId = data.item.priority.id
     }
-    this.formData.projectId = data.item.project.id
+    if(data.item.project != null) {
+      this.formData.projectId = data.item.project.id
+      this.minDate = new Date(data.item.project.fromDate)
+      this.maxDate = new Date(data.item.project.toDate)
+
+    }
+
     this.formData.typeId = data.item.state.type
     this.formData.estimation = new Date(data.item.estimation)
     this.filteredAssignees = this.assigneeCtrl.valueChanges.pipe(
@@ -186,6 +245,8 @@ export class TdlEditComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.loadProjects()
+
     this.dialogRef.keydownEvents().subscribe(event => {
       if (event.key === "Escape") {
         this.close();
@@ -211,6 +272,8 @@ export class TdlEditComponent implements OnInit{
         this.todoOwner = data
       })
     }
+
+
   }
 
 
@@ -223,13 +286,20 @@ export class TdlEditComponent implements OnInit{
     }});
   }
   close() {
-    this.dialog.open(TdlConfirmCancelFormComponent, {
-      width: '300px',
-    }).afterClosed().subscribe(result => {
-      if(result === "1") {
-        this.dialogRef.close({event:'close'});
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You want to discard the changes?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, discard it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.dialogRef.close({event:'cancel'});
       }
-    });
+    })
+
 
   }
 
@@ -255,6 +325,13 @@ export class TdlEditComponent implements OnInit{
       this.tasks = data
     })
   }
+  loadProjects() {
+    this.projectService.getAll(this.storage.getItem('user').id).subscribe((data) => {
+      // @ts-ignore
+      this.projectList = data
+    })
+  }
+
   onTaskCompleteChange() {
     let allComplete: boolean = this.tasks.filter(task => task.isCompleted).length == this.tasks.length
     if(allComplete) {
@@ -307,6 +384,7 @@ export class TdlEditComponent implements OnInit{
   @ViewChild('assigneeInput') assigneeInput: ElementRef<HTMLInputElement>;
 
   announcer = inject(LiveAnnouncer);
+  invalidForm: boolean = false
 
 
 
@@ -319,7 +397,6 @@ export class TdlEditComponent implements OnInit{
     if(this.assignees.includes(value)){
       return;
     }
-    // Add our fruit
     if (value) {
       this.todoService.addAssignee(this.data.item.id, {todoListId:this.data.item.id,email: value, permissionId: 2}).subscribe(
         data => {
@@ -327,22 +404,16 @@ export class TdlEditComponent implements OnInit{
         })
     }
 
-    // Clear the input value
     event.chipInput!.clear();
-
     this.assigneeCtrl.setValue(null);
   }
 
   remove(assignee: string): void {
     const index = this.assignees.indexOf(assignee);
-    console.log('before:' + this.assignees)
-
-    console.log(index)
     if (index >= 0) {
       this.todoService.removeAssignee(this.data.item.id, assignee).subscribe(
         data => {
           this.assignees.splice(index, 1);
-          console.log('after:' +this.assignees)
           this.announcer.announce(`Removed ${assignee}`);
         })
 
@@ -350,6 +421,9 @@ export class TdlEditComponent implements OnInit{
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
+    if(this.assignees.includes(event.option.viewValue)){
+      return;
+    }
     this.todoService.addAssignee(this.data.item.id, {todoListId:this.data.item.id,email: event.option.viewValue, permissionId: 2}).subscribe(
       data => {
         this.assignees.push(event.option.viewValue);
@@ -363,6 +437,18 @@ export class TdlEditComponent implements OnInit{
     return this.allUsersEmail.filter(email => email.toLowerCase().includes(filterValue));
   }
 
+  whenChangeProject() {
+    this.currentProject = this.projectList.find(project => project.id == this.formData.projectId)
+    this.minDate = new Date(this.currentProject.fromDate)
+    if(this.minDate < new Date())
+      this.minDate = new Date()
+    if(this.formData.estimation < this.minDate) {
+      this.formData.estimation = this.minDate
+      this.toastr.info("Todo's estimation has been change", 'Change estimation');
+
+    }
+    this.maxDate = new Date(this.currentProject.toDate)
+  }
 
 
 }

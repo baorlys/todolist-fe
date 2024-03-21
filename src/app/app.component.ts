@@ -7,20 +7,27 @@ import {MatListItem, MatListSubheaderCssMatStyler, MatNavList} from "@angular/ma
 import {MatSidenav, MatSidenavContainer, MatSidenavContent} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatMenu, MatMenuItem, MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
 import {SidebarModule} from "primeng/sidebar";
 import {ButtonModule} from "primeng/button";
-import {switchAll} from "rxjs";
 import {StorageService} from "./core/service/storage.service";
 import {ToastrService} from "ngx-toastr";
 import {UserModel} from "./model/Response/user.model";
 import {ProjectComponent} from "./feature/project/project.component";
 import {TodoListComponent} from "./feature/todo-list/todo-list.component";
-import {TdlAddComponent} from "./feature/todo-list/tdl-add/tdl-add.component";
 import {MatDialog} from "@angular/material/dialog";
 import {ProjectCreateComponent} from "./feature/project/project-create/project-create.component";
 import {ProjectService} from "./feature/project/service/project.service";
+import {SkeletonModule} from "primeng/skeleton";
+import Swal from "sweetalert2";
+import {getMessaging, getToken} from "firebase/messaging";
+import {environment} from "../environments/environment";
+import {ShellComponent} from "./share/shell/shell.component";
+import {SwUpdate} from "@angular/service-worker";
+import {EditorjsComponent} from "./share/editorjs/editorjs.component";
+import {TdlLabelComponent} from "./feature/todo-list/tdl-edit/tdl-label/tdl-label.component";
+import {ColorPickerModule} from "ngx-color-picker";
 
 
 @Component({
@@ -47,7 +54,13 @@ import {ProjectService} from "./feature/project/service/project.service";
     SidebarModule,
     ButtonModule,
     MatListSubheaderCssMatStyler,
-    ProjectComponent
+    ProjectComponent,
+    SkeletonModule,
+    MatIconButton,
+    ShellComponent,
+    EditorjsComponent,
+    TdlLabelComponent,
+    ColorPickerModule
   ],
   animations: [
     trigger('slideInOut', [
@@ -85,6 +98,7 @@ export class AppComponent implements OnInit{
   }
   project : any;
   flagAddProject: boolean = false;
+  flagDeleteProject: boolean = false;
   todoListComponent!: TodoListComponent;
 
   triggerAnimation(outlet: RouterOutlet) {
@@ -96,6 +110,17 @@ export class AppComponent implements OnInit{
               private toastr: ToastrService,
               private dialog: MatDialog,
               private projectService: ProjectService) {
+    // if (typeof Worker !== 'undefined') {
+    //   // Create a new
+    //   const worker = new Worker(new URL('./app.worker', import.meta.url));
+    //   worker.onmessage = ({ data }) => {
+    //     console.log(`page got message: ${data}`);
+    //   };
+    //   worker.postMessage('hello');
+    // } else {
+    //   // Web Workers are not supported in this environment.
+    //   // You should add a fallback so that your program still executes correctly.
+    // }
 
   }
 
@@ -109,10 +134,12 @@ export class AppComponent implements OnInit{
   }
 
 
+
   home() {
     this.page['home'] = true;
     this.page['calendar'] = false;
     this.page['profile'] = false;
+    this.project = null;
     this.router.navigate(['/todo-list']).then(r => {
       this.todoListComponent.project = null;
       this.todoListComponent.loadTodos();
@@ -120,6 +147,7 @@ export class AppComponent implements OnInit{
   }
 
   chooseProject(project: any) {
+    this.project = project;
     this.page['home'] = false;
     this.page['calendar'] = false;
     this.page['profile'] = false;
@@ -134,6 +162,7 @@ export class AppComponent implements OnInit{
     this.storage.removeItem('user')
     this.storage.removeItem('jwtToken')
     this.isLogged = false;
+    this.project = null;
     this.router.navigate(['/login']).then(r => r);
   }
 
@@ -145,15 +174,22 @@ export class AppComponent implements OnInit{
   }
 
   showLogout() {
-    this.toastr.warning("Are you sure you want to log out? Click to log out", "Log out",
+    Swal.fire(
       {
-        positionClass: 'toast-top-center',
-        closeButton: true,
-        progressBar: true,
-        progressAnimation: 'increasing',
-      }).onTap.subscribe(() => {
-      this.logOut();
-    })
+        title: "Log out",
+        text: "Are you sure you want to log out?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: "Yes"
+      }
+    ).then((result) => {
+      if(result.isConfirmed) {
+        this.logOut();
+      }
+    }
+    )
   }
 
 
@@ -181,6 +217,36 @@ export class AppComponent implements OnInit{
       }
     })
   }
+  deleteProject() {
+    Swal.fire(
+      {
+        title: "Delete project",
+        text: "Are you sure you want to delete this project?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: "Yes"
+      }
+    ).then((result) => {
+      console.log(result);
+      if(result.isConfirmed) {
+        this.projectService.delete(this.project.id).subscribe(
+          {
+            next: data => {
+              this.flagDeleteProject = true;
+              this.showSuccess(this.project, 'Delete success!', 'has been deleted!');
+            },
+            error: err => {
+              console.log(err);
+              this.showFail( this.project, 'Delete failed!', 'has not been deleted!');
+            }
+          })
+      }
+    }
+    )
+  }
+
   showSuccess(data: any, title: string, message: string) {
     this.toastr.success(data.title + ' ' + message, title);
   }

@@ -56,9 +56,21 @@ mat-sidenav-content{
   }
 }
 
-.add {
+.add-project {
   padding: 0;
   height: 25px;
+}
+
+.del-project {
+  margin-top:20px;
+  color: red;
+  margin-left: auto;
+  display: block;
+  width: fit-content;
+
+  button {
+    margin-right: 20px;
+  }
 }
 
 

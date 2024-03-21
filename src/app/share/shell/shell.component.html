@@ -1,0 +1,22 @@
+@if(isNewAppVersionAvailable) {
+  <p-messages severity="info" styleClass="message-container">
+    <ng-template pTemplate>
+      <div class="flex align-items-center">
+        <div>
+          <span class="pr-2">New App Version</span>
+          <small class="pr-2"
+          >A new version of the app is available. Please refresh your browser window or click on the refresh button.</small
+          >
+        </div>
+        <div>
+          <div class="d-inline-block" style="position: relative">
+            <p-button (click)="refreshApp()" [style]="{ height: '25px' }" styleClass="p-button-rounded">
+              <span class="text-nowrap">Refresh</span>
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-messages>
+}
+

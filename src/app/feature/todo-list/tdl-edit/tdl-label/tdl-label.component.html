@@ -1,0 +1,41 @@
+<mat-form-field>
+  <mat-label>Label</mat-label>
+  <mat-select [formControl]="labelSelected"
+              multiple
+              (selectionChange)="selectLabel()"
+
+  >
+    <mat-select-trigger>
+      @if(labelSelected.value?.length === 0) {
+        ''
+      }
+      @else {
+        {{labelSelected.value?.[0].name || ''}}
+        @if ((labelSelected.value?.length || 0) > 1) {
+          <span class="example-additional-selection">
+          (+{{(labelSelected.value?.length || 0) - 1}} {{labelSelected.value?.length === 2 ? 'other' : 'others'}})
+        </span>
+        }
+      }
+
+    </mat-select-trigger>
+    @for (label of labels; track label) {
+      <mat-option [value]="label">{{label.name}}</mat-option>
+    }
+    <mat-divider></mat-divider>
+    <mat-button-toggle class="w-100" >create new</mat-button-toggle>
+  </mat-select>
+  <br>
+</mat-form-field>
+<div>
+  @for (label of listLabelSelected; track label) {
+    <mat-chip-row (removed)="remove(label)" [ngStyle]="{'background-color': label.color}">
+      {{label.name}}
+      <button matChipRemove [attr.aria-label]="'remove ' + label">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+  }
+</div>
+
+

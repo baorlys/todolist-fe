@@ -23,7 +23,7 @@
 
 
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button [disabled]="data.title === ''" mat-button mat-dialog-close="1" (click)="confirmCreate()">Confirm</button>
+<mat-dialog-actions class="ms-auto">
+  <button  [disabled]="data.title === '' || data.fromDate === '' || data.toDate === ''" mat-button mat-dialog-close="1" (click)="confirmCreate()">Confirm</button>
 </mat-dialog-actions>
 

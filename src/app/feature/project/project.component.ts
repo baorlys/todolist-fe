@@ -6,6 +6,8 @@ import {ProjectModel} from "../../model/Response/project.model";
 import {StorageService} from "../../core/service/storage.service";
 import {ProjectService} from "./service/project.service";
 import {DatePipe, NgClass} from "@angular/common";
+import {SkeletonModule} from "primeng/skeleton";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-project',
@@ -18,7 +20,9 @@ import {DatePipe, NgClass} from "@angular/common";
     MatListItem,
     MatIcon,
     DatePipe,
-    NgClass
+    NgClass,
+    SkeletonModule,
+    MatIconButton
   ],
   templateUrl: './project.component.html',
   styleUrl: './project.component.css'
@@ -32,6 +36,8 @@ export class ProjectComponent implements OnChanges {
   clickOtherPageEvent !: Boolean;
   @Input()
   projectAddEvent !: Boolean;
+  @Input()
+  projectDeleteEvent !: Boolean;
 
   constructor(
     private storageService: StorageService,
@@ -41,10 +47,11 @@ export class ProjectComponent implements OnChanges {
     this.loadProjects()
   }
 
+
+
   loadProjects() {
     this.projectList = [];
     this.projectService.getAll(this.user.id).subscribe((data) => {
-
       // @ts-ignore
       for (let project of data) {
         project.isActive = false;
@@ -55,7 +62,7 @@ export class ProjectComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.projectAddEvent){
+    if(this.projectAddEvent || this.projectDeleteEvent){
       this.loadProjects();
       this.projectAddEvent = false;
     }
