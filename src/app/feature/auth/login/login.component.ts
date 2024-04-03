@@ -46,7 +46,6 @@ export class LoginComponent {
   constructor(private readonly auth: AuthService,
               private jwt: JwtService,
               private storage: StorageService,
-              private toastr: ToastrService,
               private router : Router,
               private appService: AppService) {}
 

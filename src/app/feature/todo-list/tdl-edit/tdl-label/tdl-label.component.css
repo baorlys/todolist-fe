@@ -44,3 +44,5 @@
 .buttons button:hover {
   background-color: #eee;
 }
+
+::ng-deep .hide-checkbox .mat-pseudo-checkbox { display: none; }

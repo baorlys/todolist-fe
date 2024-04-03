@@ -67,7 +67,7 @@ export class SignupComponent {
   showSuccess() {
     Swal.fire(
       "Success",
-      "Sign up successfully",
+      "Sign up successfully, please login to continue",
       "success")
   }
 

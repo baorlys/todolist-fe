@@ -19,7 +19,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatBadge} from "@angular/material/badge";
 import {MatChip, MatChipsModule} from "@angular/material/chips";
-import {AsyncPipe, DatePipe, NgClass, NgForOf} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgStyle} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
 import {TdlEditComponent} from "./tdl-edit/tdl-edit.component";
 import {TaskService} from "./service/task.service";
@@ -75,6 +75,7 @@ import Swal from 'sweetalert2';
     MatTab,
     MatGridList,
     MatGridTile,
+    NgStyle,
   ],
   providers: [{
     provide: CalendarDateFormatter,
@@ -89,9 +90,14 @@ export class TodoListComponent{
   todos: any[] = []
   doings: any[] = []
   done: any[] = []
+  data: Column[] = [];
 
   project: any
-
+// let list ={
+//   "todos": [],
+//   "doings": [],
+//   "done": []
+// }
   constructor(private http: HttpClient,
               private todoListService: TodoListService,
               private taskService: TaskService,
@@ -114,14 +120,14 @@ export class TodoListComponent{
         event.currentIndex,
       );
       let todoUpdate = event.container.data[event.currentIndex]
-      switch (event.container.id.split('-')[3]) {
-        case '0':
+      switch (event.container.id) {
+        case 'todoList':
           todoUpdate.state.type = State.TODO
           break;
-        case '1':
+        case 'doingList':
           todoUpdate.state.type = State.DOING
           break;
-        case '2':
+        case 'doneList':
           todoUpdate.state.type = State.DONE
           break;
       }
@@ -170,9 +176,17 @@ export class TodoListComponent{
       // @ts-ignore
       this.done = data.filter(data => data.state.type == '3')
       this.addTasksInfoToJson(this.done)
+
+      this.data = [
+        {id: 'todoList', name: 'To do', data: this.todos},
+        {id: 'doingList', name: 'Doing', data: this.doings},
+        {id: 'doneList', name: 'Done', data: this.done}
+      ]
     })
+  }
 
-
+  connectList(id: string) {
+    return this.data.map(x => x.id).filter(x => x !== id);
   }
 
 
@@ -354,6 +368,7 @@ export interface Column {
   name: string;
   data: any;
 }
+
 
 
 

@@ -72,6 +72,7 @@ import {ShellComponent} from "../../../share/shell/shell.component";
 import {AngularEditorConfig, AngularEditorModule} from "@kolkov/angular-editor";
 import {TdlLabelComponent} from "./tdl-label/tdl-label.component";
 import {NzColorPickerComponent} from "ng-zorro-antd/color-picker";
+import {LabelService} from "../service/label.service";
 
 @Component({
   selector: 'app-tdl-edit',
@@ -208,7 +209,8 @@ export class TdlEditComponent implements OnInit{
   }
   currentProject : any = null
 
-
+  todoId: string = ''
+  listLabelSelected: any[] = [];
   projectList: any[] = [];
 
   constructor(public dialogRef: MatDialogRef<TdlEditComponent>,
@@ -221,9 +223,12 @@ export class TdlEditComponent implements OnInit{
               private taskService: TaskService,
               private userServive: UserService,
               private projectService: ProjectService,
+              private labelService: LabelService,
               public dialog: MatDialog
   ) {
     this.formData = data.item
+    this.todoId = data.item.id
+    this.listLabelSelected = data.item.labels
     this.loadStates()
     this.loadTasks()
     if(data.item.priority != null) {
@@ -246,7 +251,6 @@ export class TdlEditComponent implements OnInit{
 
   ngOnInit(): void {
     this.loadProjects()
-
     this.dialogRef.keydownEvents().subscribe(event => {
       if (event.key === "Escape") {
         this.close();
@@ -272,8 +276,6 @@ export class TdlEditComponent implements OnInit{
         this.todoOwner = data
       })
     }
-
-
   }
 
 
@@ -332,6 +334,15 @@ export class TdlEditComponent implements OnInit{
     })
   }
 
+  loadLabelsOfTodo() {
+
+    this.labelService.getByTodoId(this.todoId).subscribe((data) => {
+      //@ts-ignore
+      this.listLabelSelected = data;
+
+    })
+  }
+
   onTaskCompleteChange() {
     let allComplete: boolean = this.tasks.filter(task => task.isCompleted).length == this.tasks.length
     if(allComplete) {
@@ -359,6 +370,8 @@ export class TdlEditComponent implements OnInit{
       this.states = data
     })
   }
+
+
 
   showSuccess(data: any, title: string, message: string) {
     this.toastr.success(data.title + ' ' + message, title);

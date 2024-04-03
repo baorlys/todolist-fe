@@ -19,6 +19,8 @@ import {SweetAlert2Module} from "@sweetalert2/ngx-sweetalert2";
 import {environment} from "../environments/environment";
 import {initializeApp} from "firebase/app";
 import {ServiceWorkerModule} from "@angular/service-worker";
+import { ColorPickerModule } from 'ngx-color-picker';
+import {MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule} from "@vipstorage/material-color-picker";
 initializeApp(environment.firebase);
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -69,11 +71,13 @@ export const routes: Routes = [
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: true,
       registrationStrategy: 'registerWhenStable:3000'}),
+    NgxMatColorPickerModule,
   ],
   exports: [],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' },
-    { provide: MOMENT, useValue: moment }
+    { provide: MOMENT, useValue: moment },
+    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }
   ],
 })
 export class AppRoutingModule {
